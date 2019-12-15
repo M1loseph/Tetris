@@ -23,5 +23,5 @@ bool Joystick::Left() const {
   return analogRead(m_xAxile) > m_StickSens;
 }
 bool Joystick::Button() const {
-  return analogRead(m_Button < 40);
+  return analogRead(m_Button) < 40;
 }

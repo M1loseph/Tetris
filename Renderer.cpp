@@ -90,6 +90,7 @@ int Renderer::GetHeight() {
 bool Renderer::RenderLine(int y, uint8_t hex)
 {
   if(y <0 || y >= m_Height) return false;
+  
   m_Matrix->setColumn(y, hex);
   return true;
 }
