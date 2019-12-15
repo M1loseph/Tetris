@@ -1,15 +1,15 @@
 #pragma once
-#include "Joystick.h"
+#include "Controller.h"
 #include "Renderer.h"
 #include "Brick.h"
 
 class Game {
   public:
-    Game(Joystick* joystick, Renderer* renderer); // must be allocated staticly
+    Game(Controller* joystick, Renderer* renderer); // must be allocated staticly
     bool Start();
 
   private:
-    Joystick* m_Joystick;
+    Controller* m_Controller;
     Renderer* m_Renderer;
     bool* m_GameMatrix;
     Brick* m_CurrentBrick;
@@ -24,4 +24,5 @@ class Game {
     void CopyToGameMatrix();
     bool GameOver();
     void UpdateMap();
+    void EndScreen();
 };

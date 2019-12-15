@@ -3,10 +3,10 @@
 #define DEF_SPEED 5
 #define TICK_RATE 30.0f
 
-Game::Game(Joystick* joystick, Renderer* renderer)
+Game::Game(Controller* controller, Renderer* renderer)
 {
   m_CurrentBrick = nullptr;
-  m_Joystick = joystick;
+  m_Controller = controller;
   m_Renderer = renderer;
   m_GameMatrix = nullptr;
 
@@ -17,7 +17,7 @@ Game::Game(Joystick* joystick, Renderer* renderer)
 }
 bool Game::Start()
 {
-  if (!m_Joystick || !m_Renderer) return false;
+  if (!m_Controller || !m_Renderer) return false;
 
   m_Running = true;
   m_Width = m_Renderer->GetWidth();
@@ -40,7 +40,7 @@ bool Game::Start()
       Render();
     }
   }
-  m_Renderer->Clear();
+  EndScreen();
   delete m_CurrentBrick;
   delete m_GameMatrix;
   m_GameMatrix = nullptr;
@@ -66,11 +66,11 @@ void Game::UpdateGame()
   }
 
 
-  if (m_Joystick->RightPressed()) Move(1, 0, 0);
-  else if (m_Joystick->LeftPressed()) Move(-1, 0, 0);
-  else if (m_Joystick->ButtonPressed()) Move(0, 0, 1);
-  if (m_Joystick->Down() && m_Speed != 1 ) m_Speed -= 1;
-  if (m_Joystick->Up() && m_Speed < DEF_SPEED ) m_Speed += 1;
+  if (m_Controller->RightPressed()) Move(1, 0, 0);
+  else if (m_Controller->LeftPressed()) Move(-1, 0, 0);
+  else if (m_Controller->ButtonPressed()) Move(0, 0, 1);
+  if (m_Controller->Down() && m_Speed != 1 ) m_Speed -= 1;
+  if (m_Controller->Up() && m_Speed < DEF_SPEED ) m_Speed += 1;
 
   if ( counter++ % m_Speed == 0)
   {
@@ -79,7 +79,6 @@ void Game::UpdateGame()
       CopyToGameMatrix();
     }
   }
-
 }
 void Game::Render()
 {
@@ -182,7 +181,7 @@ bool Game::Move(int xOffset, int yOffeset, int rotation) {
         {
           int newX = m_CurrentBrick->GetX() + x + xOffset;
           int newY = m_CurrentBrick->GetY() + y + yOffeset;
-          
+
           if (newX >= m_Width || newX < 0) return false;
           if (newY >= m_Height || newY < 0) return false;
           if (m_GameMatrix[newX + newY * m_Width]) return false;
@@ -234,4 +233,17 @@ void Game::UpdateMap() {
       --y;
     }
   }
+}
+
+
+void Game::EndScreen()
+{
+  m_Renderer->Clear();
+  delay(200);
+  const uint8_t letters[14] = { 0x3C, 0x42, 0x40, 0x4E, 0x42, 0x3C, 0x0,
+                                0x7E, 0x42, 0x7E, 0x42, 0x42, 0x42, 0x0
+                              };
+  for (int i = 0; i < 14; i++)
+    m_Renderer->RenderLine(m_Height - 1 - i, letters[i]);
+  delay(5000);
 }

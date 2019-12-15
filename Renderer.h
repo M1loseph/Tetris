@@ -11,6 +11,7 @@ class Renderer {
     void Clear();
     void Display();
     bool Render(const Brick& brick);
+    bool RenderLine(int y, uint8_t hex);
     bool Render(int x, int y);
     int GetWidth();
     int GetHeight();

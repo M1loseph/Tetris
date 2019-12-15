@@ -29,9 +29,6 @@ Renderer::~Renderer()
 }
 
 
-// Interface
-
-
 void Renderer::Display()
 {
   for (int y = 0; y < m_Height; y++)
@@ -87,4 +84,12 @@ int Renderer::GetWidth() {
 }
 int Renderer::GetHeight() {
   return m_Height;
+}
+
+
+bool Renderer::RenderLine(int y, uint8_t hex)
+{
+  if(y <0 || y >= m_Height) return false;
+  m_Matrix->setColumn(y, hex);
+  return true;
 }

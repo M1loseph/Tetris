@@ -1,6 +1,5 @@
 #include "Brick.h"
 
-
 Brick::Brick(int x, int y, bool shape[16])
 {
   m_X = x;
