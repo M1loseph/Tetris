@@ -89,8 +89,9 @@ int Renderer::GetHeight() {
 
 bool Renderer::RenderLine(int y, uint8_t hex)
 {
-  if(y <0 || y >= m_Height) return false;
+  if(y < 0 || y >= m_Height) return false;
+  for(int x = 0; x < 8; x++)
+    m_CurrentFrame[x + y * m_Width] = (hex >> x) & 0x01;
   
-  m_Matrix->setColumn(y, hex);
   return true;
 }

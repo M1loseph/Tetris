@@ -16,10 +16,10 @@ bool Joystick::Up() const {
 bool Joystick::Down() const {
   return analogRead(m_yAxile) > m_StickSens;
 }
-bool Joystick::Right() const {
+bool Joystick::Left() const {
   return 1023 - analogRead(m_xAxile) > m_StickSens;
 }
-bool Joystick::Left() const {
+bool Joystick::Right() const {
   return analogRead(m_xAxile) > m_StickSens;
 }
 bool Joystick::Button() const {

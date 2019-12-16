@@ -1,6 +1,7 @@
 #include "Game.h"
 
 #define DEF_SPEED 5
+#define USER_UPDATE_RATE 2
 #define TICK_RATE 30.0f
 
 Game::Game(Controller* controller, Renderer* renderer)
@@ -31,6 +32,7 @@ bool Game::Start()
   unsigned long lastTime = millis();
   unsigned long delta = 1000.0f / TICK_RATE;
 
+  while (!m_Controller->Button());
   while (m_Running)
   {
     if (millis() - lastTime >= delta)
@@ -65,13 +67,14 @@ void Game::UpdateGame()
     }
   }
 
-
-  if (m_Controller->RightPressed()) Move(1, 0, 0);
-  else if (m_Controller->LeftPressed()) Move(-1, 0, 0);
-  else if (m_Controller->ButtonPressed()) Move(0, 0, 1);
-  if (m_Controller->Down() && m_Speed != 1 ) m_Speed -= 1;
-  if (m_Controller->Up() && m_Speed < DEF_SPEED ) m_Speed += 1;
-
+  if ( counter % USER_UPDATE_RATE == 0)
+  {
+    if (m_Controller->Right()) Move(-1, 0, 0);
+    else if (m_Controller->Left()) Move(1, 0, 0);
+    else if (m_Controller->ButtonPressed()) Move(0, 0, 1);
+    if (m_Controller->Down() && m_Speed != 1 ) m_Speed -= 1;
+    if (m_Controller->Up() && m_Speed < DEF_SPEED ) m_Speed += 1;
+  }
   if ( counter++ % m_Speed == 0)
   {
     if (!Move(0, -1, 0))
@@ -255,6 +258,7 @@ void Game::EndScreen()
     {
       m_Renderer->RenderLine(i - j, letters[j]);
     }
+    m_Renderer->Display();
     delay(200);
   }
   delay(5000);

@@ -1,6 +1,6 @@
 #include "Game.h"
 #include "Joystick.h"
-#include "Keyboard.h"
+#include "SerialController.h"
 
 // screen resolution
 #define WIDTH   8
@@ -30,7 +30,7 @@ void loop()
 {
   Renderer renderer(WIDTH, HEIGHT, HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
   Joystick joystick( JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
-  Keyboard keyboard('a','d','w','s',' ');
-  Game game(&joystick, &renderer);
+  SerialController keyboard('a','d','w','s',' ');
+  Game game(&keyboard, &renderer);
   game.Start();
 }
