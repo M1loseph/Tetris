@@ -1,12 +1,12 @@
 #include "Joystick.h"
 #include <Arduino.h>
 
-Joystick::Joystick(int xAxile, int yAxile, int button, int sensitivity, int buttonSens) {
+Joystick::Joystick(int xAxile, int yAxile, int button, int sensitivity) {
+  pinMode(button, INPUT_PULLUP);
   m_xAxile =  xAxile;
   m_yAxile = yAxile;
   m_Button = button;
   m_StickSens = sensitivity;
-  m_ButtonSens = buttonSens;
 }
 
 
@@ -23,5 +23,5 @@ bool Joystick::Right() const {
   return analogRead(m_xAxile) > m_StickSens;
 }
 bool Joystick::Button() const {
-  return analogRead(m_Button) < 40;
+  return digitalRead(m_Button) == LOW;
 }

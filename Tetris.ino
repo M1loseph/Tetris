@@ -31,6 +31,6 @@ void loop()
   Renderer renderer(WIDTH, HEIGHT, HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
   Joystick joystick( JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
   SerialController keyboard('a','d','w','s',' ');
-  Game game(&keyboard, &renderer);
+  Game game(&joystick, &renderer);
   game.Start();
 }
