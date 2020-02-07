@@ -16,7 +16,7 @@
 // joystick pins
 #define JOYSTICK_X A4
 #define JOYSTICK_Y A5
-#define JOYSTICK_B A0
+#define JOYSTICK_B 2
 
 
 void setup()
