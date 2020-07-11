@@ -3,22 +3,23 @@
 
 #include "Controller.hpp"
 
-#define DEF_STICK_SENS 900
+class joystick : public controller
+{
+public:
+  joystick(int x, int y, int button, int stickSens = DEF_SENSITIVITY);
 
-class Joystick : public Controller {
-  public:
+  bool up() const;
+  bool down() const;
+  bool left() const;
+  bool right() const;
+  bool button() const;
 
-    Joystick(int xAxile, int yAxile, int button, int stickSens = DEF_STICK_SENS);
+  static constexpr size_t DEF_SENSITIVITY = 900;
+  // this value may differ among different devices
+  static constexpr size_t MAX_ANALOG_VALUE = 1023;
 
-    bool Up() const;
-    bool Down() const;
-    bool Left() const;
-    bool Right() const;
-    bool Button() const;
-    
-  private:
-    bool IfPressedOnce(bool& released, bool pressed) const;
-    int m_xAxile, m_yAxile, m_Button, m_StickSens;
+private:
+  int _x, _y, _button, _sensitivity;
 };
 
-#endif // __JOYSTICK_HPP__ 
+#endif // __JOYSTICK_HPP__

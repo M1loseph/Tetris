@@ -1,32 +1,35 @@
-#ifndef __GAME_HPP__ 
-#define __GAME_HPP__ 
+#ifndef __GAME_HPP__
+#define __GAME_HPP__
 
 #include "Controller.hpp"
 #include "Renderer.hpp"
 #include "Brick.hpp"
 
-class Game {
-  public:
-    Game(Controller* joystick, Renderer* renderer); // must be allocated staticly
-    bool Start();
+class game
+{
+public:
+  game(controller &controller, renderer &renderer, size_t update_interval, size_t uset_input_interval); // must be allocated staticly
+  void start();
 
-  private:
-    Controller* m_Controller;
-    Renderer* m_Renderer;
-    bool* m_GameMatrix;
-    Brick* m_CurrentBrick;
-    int m_Width, m_Height;
-    bool m_Running;
-    int m_Speed;
+private:
+  controller &_controller;
+  renderer &_renderer;
+  // again -> static cuz dynamic allocation is not the greatest idea
+  bool _boards[renderer::_height * renderer::_width];
+  brick _current_brick;
+  bool _is_running;
+  size_t _update_interval;
+  size_t _uset_input_interval;
 
-    void UpdateGame();
-    void Render();
-    Brick* RandomBrick();
-    bool Move(int xOffset, int yOffset, int rotation);
-    void CopyToGameMatrix();
-    bool GameOver();
-    void UpdateMap();
-    void EndScreen();
+  void update_game();
+  void render();
+  brick random_brick();
+  bool move(int x_offset, int y_offset, brick::brick_rotation rotation);
+  void copy_to_board();
+  bool game_over();
+  void update_board();
+  // TODO => WYJEBAĆ W PIZDU
+  void EndScreen();
 };
 
 #endif // __GAME_HPP__

@@ -1,264 +1,334 @@
-#include "Game.hpp"
+#include "game.hpp"
 
 #define DEF_SPEED 5
 #define USER_UPDATE_RATE 2
-#define TICK_RATE 30.0f
 
-Game::Game(Controller* controller, Renderer* renderer)
+game::game(controller &controller, renderer &renderer, size_t update_interval, size_t uset_input_interval) : _controller(controller),
+                                                                                                             _renderer(renderer),
+                                                                                                             _update_interval(update_interval),
+                                                                                                             _uset_input_interval(uset_input_interval)
 {
-  m_CurrentBrick = nullptr;
-  m_Controller = controller;
-  m_Renderer = renderer;
-  m_GameMatrix = nullptr;
-
-
-  m_Width = 0;
-  m_Height = 0;
-  m_Speed = DEF_SPEED;
 }
-bool Game::Start()
+
+void game::start()
 {
-  if (!m_Controller || !m_Renderer) return false;
-
-  m_Running = true;
-  m_Width = m_Renderer->GetWidth();
-  m_Height = m_Renderer->GetHeight();
-
-  m_GameMatrix = new bool[m_Width * m_Height];
-  for (int i = 0; i < m_Width * m_Height; i++)
-    m_GameMatrix[i] = false;
-  m_Renderer->Clear();
+  _is_running = true;
+  _renderer.clear();
 
   unsigned long lastTime = millis();
-  unsigned long delta = 1000.0f / TICK_RATE;
+  unsigned long delta = ;
 
-  while (!m_Controller->Button());
-  while (m_Running)
+  while (!_controller->Button())
+    ;
+  while (_running)
   {
     if (millis() - lastTime >= delta)
     {
       lastTime = millis();
-      UpdateGame();
-      Render();
+      update_game();
+      render();
     }
   }
   EndScreen();
-  delete m_CurrentBrick;
-  delete m_GameMatrix;
-  m_GameMatrix = nullptr;
-  m_CurrentBrick = nullptr;
+  delete _current_brick;
+  delete _boards;
+  _boards = nullptr;
+  _current_brick = nullptr;
 
   return true;
 }
 
-
-void Game::UpdateGame()
+void game::update_game()
 {
   static unsigned long counter = 0;
-  if (!m_CurrentBrick)
+  if (!_current_brick)
   {
-    UpdateMap();
-    m_Speed = DEF_SPEED;
-    m_CurrentBrick = RandomBrick();
-    if (!Move(0, 0, 0))
+    update_board();
+    _speed = DEF_SPEED;
+    _current_brick = random_brick();
+    if (!move(0, 0, 0))
     {
-      m_Running = false;
+      _running = false;
       return;
     }
   }
 
-  if ( counter % USER_UPDATE_RATE == 0)
+  if (counter % USER_UPDATE_RATE == 0)
   {
-    if (m_Controller->Right()) Move(-1, 0, 0);
-    else if (m_Controller->Left()) Move(1, 0, 0);
-    else if (m_Controller->ButtonPressed()) Move(0, 0, 1);
-    if (m_Controller->Down() && m_Speed != 1 ) m_Speed -= 1;
-    if (m_Controller->Up() && m_Speed < DEF_SPEED ) m_Speed += 1;
+    if (_controller->Right())
+      move(-1, 0, 0);
+    else if (_controller->Left())
+      move(1, 0, 0);
+    else if (_controller->ButtonPressed())
+      move(0, 0, 1);
+    if (_controller->Down() && _speed != 1)
+      _speed -= 1;
+    if (_controller->Up() && _speed < DEF_SPEED)
+      _speed += 1;
   }
-  if ( counter++ % m_Speed == 0)
+  if (counter++ % _speed == 0)
   {
-    if (!Move(0, -1, 0))
+    if (!move(0, -1, 0))
     {
-      CopyToGameMatrix();
+      copy_to_board();
     }
   }
 }
-void Game::Render()
+void game::render()
 {
   for (int y = 0; y < m_Height; y++)
-    for (int x = 0; x <  m_Width; x++)
-      if (m_GameMatrix[x + y * m_Width]) m_Renderer->Render(x, y);
+    for (int x = 0; x < m_Width; x++)
+      if (_boards[x + y * m_Width])
+        _renderer->render(x, y);
 
-  if (m_CurrentBrick)
-    m_Renderer->Render(*m_CurrentBrick);
+  if (_current_brick)
+    _renderer->render(*_current_brick);
 
-  m_Renderer->Display();
+  _renderer->Display();
 }
 
-
-
-Brick* Game::RandomBrick()
+brick *game::random_brick()
 {
   int defHeight = m_Height * 3 / 4;
   int defWidth = 0;
   int brick = random(6);
   switch (brick)
   {
-    case 0 :
-      {
-        bool model[16] =  { 0, 0, 0, 0,
-                            0, 1, 1, 0,
-                            0, 1, 1, 0,
-                            0, 0, 0, 0,
-                          };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
-    case 1 :
-      {
-        bool model[16] = { 0, 0, 1, 0,
-                           0, 0, 1, 0,
-                           0, 0, 1, 0,
-                           0, 0, 1, 0,
-                         };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
-    case 2 :
-      {
-        bool model[16] = { 0, 1, 0, 0,
-                           0, 1, 1, 0,
-                           0, 0, 1, 0,
-                           0, 0, 0, 0,
-                         };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
-    case 3 :
-      {
-        bool model[16] = { 0, 1, 0, 0,
-                           0, 1, 0, 0,
-                           0, 1, 1, 0,
-                           0, 0, 0, 0,
-                         };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
-    case 4 :
-      {
-        bool model[16] = { 0, 0, 1, 0,
-                           0, 0, 1, 0,
-                           0, 1, 1, 0,
-                           0, 0, 0, 0,
-                         };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
-    case 5 :
-      {
-        bool model[16] = { 0, 0, 0, 0,
-                           0, 0, 1, 0,
-                           0, 1, 1, 1,
-                           0, 0, 0, 0,
-                         };
-        return new Brick(defWidth, defHeight, model);
-        break;
-      }
+  case 0:
+  {
+    bool model[16] = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
+  case 1:
+  {
+    bool model[16] = {
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
+  case 2:
+  {
+    bool model[16] = {
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
+  case 3:
+  {
+    bool model[16] = {
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
+  case 4:
+  {
+    bool model[16] = {
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
+  case 5:
+  {
+    bool model[16] = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+    };
+    return new brick(defWidth, defHeight, model);
+    break;
+  }
   }
   return nullptr;
 }
 
+bool game::move(int xOffset, int yOffeset, int rotation)
+{
 
-
-bool Game::Move(int xOffset, int yOffeset, int rotation) {
-
-  if (m_CurrentBrick)
+  if (_current_brick)
   {
-    int finalRotation = m_CurrentBrick->GetRotation() + rotation;
+    int finalRotation = _current_brick->rotation() + rotation;
 
-    for (int y = 0; y < m_CurrentBrick->GetHeight(); y++)
+    for (int y = 0; y < _current_brick->_height(); y++)
     {
-      for (int x = 0; x < m_CurrentBrick->GetWidth(); x++)
+      for (int x = 0; x < _current_brick->_width(); x++)
       {
-        if (m_CurrentBrick->GetPixel(x, y, finalRotation))
+        if (_current_brick->pixel_at(x, y, finalRotation))
         {
-          int newX = m_CurrentBrick->GetX() + x + xOffset;
-          int newY = m_CurrentBrick->GetY() + y + yOffeset;
+          int newX = _current_brick->x() + x + xOffset;
+          int newY = _current_brick->y() + y + yOffeset;
 
-          if (newX >= m_Width || newX < 0) return false;
-          if (newY >= m_Height || newY < 0) return false;
-          if (m_GameMatrix[newX + newY * m_Width]) return false;
+          if (newX >= m_Width || newX < 0)
+            return false;
+          if (newY >= m_Height || newY < 0)
+            return false;
+          if (_boards[newX + newY * m_Width])
+            return false;
         }
       }
     }
-    m_CurrentBrick->ChangeX(xOffset);
-    m_CurrentBrick->ChangeY(yOffeset);
-    m_CurrentBrick->ChangeRotation(rotation);
+    _current_brick->move_x(xOffset);
+    _current_brick->move_y(yOffeset);
+    _current_brick->rotate_right(rotation);
     return true;
   }
   return false;
 }
 
-
-void Game::CopyToGameMatrix()
+void game::copy_to_board()
 {
-  for (int y = 0; y < m_CurrentBrick->GetHeight(); y++)
+  for (int y = 0; y < _current_brick->_height(); y++)
   {
-    for (int x = 0; x < m_CurrentBrick->GetWidth(); x++)
+    for (int x = 0; x < _current_brick->_width(); x++)
     {
-      if (m_CurrentBrick->GetPixel(x, y))
+      if (_current_brick->pixel_at(x, y))
       {
-        int xCor = m_CurrentBrick->GetX() + x;
-        int yCor = m_CurrentBrick->GetY() + y;
-        m_GameMatrix[xCor + yCor * m_Width] = true;
+        int xCor = _current_brick->x() + x;
+        int yCor = _current_brick->y() + y;
+        _boards[xCor + yCor * m_Width] = true;
       }
     }
   }
-  delete m_CurrentBrick;
-  m_CurrentBrick = nullptr;
+  delete _current_brick;
+  _current_brick = nullptr;
 }
 
-void Game::UpdateMap() {
+void game::update_board()
+{
   for (int y = 0; y < m_Height; y++)
   {
     bool fullLine = true;
     for (int x = 0; x < m_Width && fullLine; x++)
     {
-      if (!m_GameMatrix[ x + y * m_Width]) fullLine = false;
+      if (!_boards[x + y * m_Width])
+        fullLine = false;
     }
     if (fullLine)
     {
-      for (int i = y * m_Width; i < (m_Height - 1)*m_Width; i++)
-        m_GameMatrix[i] = m_GameMatrix[i + m_Width];
+      for (int i = y * m_Width; i < (m_Height - 1) * m_Width; i++)
+        _boards[i] = _boards[i + m_Width];
 
       for (int i = (m_Height - 1) * m_Width; i < m_Height * m_Width; i++)
-        m_GameMatrix[i] = false;
+        _boards[i] = false;
       --y;
     }
   }
 }
 
-
-void Game::EndScreen()
+// reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
+void game::EndScreen()
 {
-  m_Renderer->Clear();
+  _renderer->Clear();
   delay(200);
-  const uint8_t letters[72] = { 0x7E, 0x81, 0x80, 0x8F, 0x81, 0x81, 0x81, 0x7E, 0x0,
-                                0xFF, 0x81, 0x81, 0x81, 0xFF, 0x81, 0x81, 0x81, 0x0,
-                                0x81, 0xC3, 0xA5, 0x99, 0x81, 0x81, 0x81, 0x81, 0x0,
-                                0xFF, 0x80, 0x80, 0xF8, 0xF8, 0x80, 0x80, 0xFF, 0x0,
-                                0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF, 0x0,
-                                0x81, 0x81, 0x42, 0x42, 0x24, 0x24, 0x18, 0x18, 0x0,
-                                0xFF, 0x80, 0x80, 0xF8, 0xF8, 0x80, 0x80, 0xFF, 0x0,
-                                0xFC, 0x84, 0x84, 0xFC, 0xA0, 0x90, 0x88, 0x84, 0x0
-                              };
+  const uint8_t letters[72] = {0x7E, 0x81, 0x80, 0x8F, 0x81, 0x81, 0x81, 0x7E, 0x0,
+                               0xFF, 0x81, 0x81, 0x81, 0xFF, 0x81, 0x81, 0x81, 0x0,
+                               0x81, 0xC3, 0xA5, 0x99, 0x81, 0x81, 0x81, 0x81, 0x0,
+                               0xFF, 0x80, 0x80, 0xF8, 0xF8, 0x80, 0x80, 0xFF, 0x0,
+                               0xFF, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xFF, 0x0,
+                               0x81, 0x81, 0x42, 0x42, 0x24, 0x24, 0x18, 0x18, 0x0,
+                               0xFF, 0x80, 0x80, 0xF8, 0xF8, 0x80, 0x80, 0xFF, 0x0,
+                               0xFC, 0x84, 0x84, 0xFC, 0xA0, 0x90, 0x88, 0x84, 0x0};
   for (int i = 0; i < m_Height + 72; i++)
   {
     for (int j = 0; j < 72; j++)
     {
-      m_Renderer->RenderLine(i - j, letters[j]);
+      _renderer->RenderLine(i - j, letters[j]);
     }
-    m_Renderer->Display();
+    _renderer->Display();
     delay(200);
   }
   delay(5000);

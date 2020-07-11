@@ -1,10 +1,6 @@
 #include "Game.hpp"
 #include "Joystick.hpp"
-#include "SerialController.hpp"
-
-// screen resolution
-#define WIDTH   8
-#define HEIGHT 32
+#include "serial_controller.hpp"
 
 // screen info
 #define HARDWARE_TYPE MD_MAX72XX::FC16_HW
@@ -28,9 +24,12 @@ void setup()
 
 void loop()
 {
-  Renderer renderer(WIDTH, HEIGHT, HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
-  Joystick joystick( JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
-  SerialController keyboard('a','d','w','s',' ');
-  Game game(&joystick, &renderer);
-  game.Start();
+  // KURWA TODO
+  // NIE PAMIĘTAM, JAK WYGLĄDAŁ KONSTRUKTORA XDDDDDDDDDDD
+  MD_MAX72XX matrix();
+  renderer renderer(WIDTH, HEIGHT, HARDWARE_TYPE, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
+  joystick joystick( JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
+  serial_controller keyboard('a','d','w','s',' ');
+  game game(&joystick, &renderer);
+  game.start();
 }

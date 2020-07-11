@@ -1,71 +1,84 @@
-#include "Brick.hpp"
+#include <stdio.h>
+#include <string.h>
+#include "brick.hpp"
 
-Brick::Brick(int x, int y, bool shape[16])
+
+explicit brick::brick() : _x(0),
+                          _y(0)
 {
-  m_X = x;
-  m_Y = y;
-  m_Rotation = 0;
+  memset(_pixels, true, sizeof(_pixels));
+}
+// memset is for debuggin purposes
+// if specified pointer is invalid, the shape will become a square
+brick::brick(int x, int y, bool *shape) : _x(x),
+                                          _y(y)
+{
   if (shape)
-  {
-    for (int i = 0 ; i < 16; i++)
-    {
-      m_Shape[i] = shape[i];
-    }
-  }
+    memcpy(_pixels, shape, sizeof(_pixels));
+  else
+    memset(_pixels, true, sizeof(_pixels));
 }
 
-bool Brick::GetPixel(int x, int y, bool* succ) const
+brick::pixel_info brick::pixel_at(uint8_t x, uint8_t y) const
 {
-  return GetPixel(x, y, m_Rotation, succ);
+  return pixel_at_if(x, y, _rotation);
 }
 
-bool Brick::GetPixel(int x, int y, int rotation, bool* succ) const
+brick::pixel_info brick::pixel_at_if(uint8_t x, uint8_t y, brick_rotation rotation) const
 {
-  if ( x >= 0 && x < GetWidth() && y >= 0 && y < GetHeight())
+  if (x >= 0 && x < _width && y >= 0 && y < _height)
   {
-    if (succ) (*succ) = true;
-    switch (rotation % 4)
+    bool is_active;
+    switch (rotation)
     {
-      case 0: return m_Shape[x + y * GetHeight()];
-      case 1: return m_Shape[(GetHeight() - 1) * GetWidth() + y - x * GetHeight()];
-      case 2: return m_Shape[(GetWidth() * GetHeight() - 1) - x - y * GetHeight()];
-      case 3: return m_Shape[(GetHeight() - 1) - y + x * GetHeight()];
+    case brick_rotation::UP:
+      is_active = _pixels[x + y * _height];
+    case brick_rotation::RIGHT:
+      is_active = _pixels[(_height - 1) * _width + y - x * _height];
+    case brick_rotation::DOWN:
+      is_active = _pixels[(_width * _height - 1) - x - y * _height];
+    case brick_rotation::LEFT:
+      is_active = _pixels[(_height - 1) - y + x * _height];
     }
+    return is_active ? pixel_info::TRUE : pixel_info::FALSE;
   }
-  if (succ) (*succ) = false;
-  return false;
+  return pixel_info::NOT_FOUND;
 }
 
-int Brick::GetWidth() const {
-  return 4;
+int brick::x() const
+{
+  return _x;
 }
-int Brick::GetHeight() const {
-  return 4;
+int brick::y() const
+{
+  return _y;
 }
-int Brick::GetX() const {
-  return m_X;
+brick::brick_rotation brick::rotation() const
+{
+  return _rotation;
 }
-int Brick::GetY() const {
-  return m_Y;
+void brick::set_x(int x)
+{
+  _x = x;
 }
-int Brick::GetRotation() const {
-  return m_Rotation;
+void brick::set_y(int y)
+{
+  _y = y;
 }
-void Brick::SetX(int newX) {
-  m_X = newX;
+void brick::set_rotation(brick_rotation rotation)
+{
+  _rotation = rotation;
 }
-void Brick::SetY(int newY) {
-  m_Y = newY;
+
+void brick::move(int x_offset, int y_offset)
+{
+  _x += x_offset;
+  _y += y_offset;
 }
-void Brick::SetRotation(int rotation) {
-  m_Rotation = rotation;
+
+void brick::rotate_left()
+{
 }
-void Brick::ChangeX(int offset){
-  m_X += offset;
-}
-void Brick::ChangeY(int offset){
-  m_Y += offset;
-}
-void Brick::ChangeRotation(int offset){
-  m_Rotation += offset;
+void brick::rotate_right()
+{
 }

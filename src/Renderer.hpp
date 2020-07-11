@@ -2,29 +2,29 @@
 #define __RENDERER_HPP__
 
 #include <MD_MAX72xx.h>
-#include "Brick.hpp"
+#include "brick.hpp"
 
-class Renderer {
-  public:
-    
-    Renderer(int width, int height, MD_MAX72XX::moduleType_t moduleType, int dataPin, int clkPin, int csPin, int segments);
-    ~Renderer();
+class renderer
+{
+public:
+  renderer(MD_MAX72XX &matrix);
 
-    void Clear();
-    void Display();
-    bool Render(const Brick& brick);
-    bool RenderLine(int y, uint8_t hex);
-    bool Render(int x, int y);
-    int GetWidth();
-    int GetHeight();
+  void init();
+  void clear();
+  void display();
+  void render(const brick &brick);
+  bool render_line(int y, uint8_t hex);
+  bool render(int x, int y);
 
-  private:
+  static constexpr size_t _width = 8U;
+  static constexpr size_t _height = 8U;
 
-    int m_Width;
-    int m_Height;
-    bool* m_CurrentFrame;
-    bool* m_OldFrame;
-    MD_MAX72XX* m_Matrix;
+private:
+  bool _current_frame[_width * _height];
+  bool _old_frame[_width * _height];
+  // reference to the external MD_MAX72XX, needs to live longer than Renderer object
+  // removed 'new' operatuz cuz its not the greatest idea to use it one microcontroller, right?
+  MD_MAX72XX &_matrix;
 };
 
 #endif // __RENDERER_HPP__

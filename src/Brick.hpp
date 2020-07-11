@@ -1,39 +1,73 @@
 #ifndef __BRICK_HPP__
 #define __BRICK_HPP__
 
-class Brick {
-  public:
+class brick
+{
+public:
+  enum class brick_rotation
+  {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+  };
 
-    Brick(int x, int y, bool shape[16]);
+  enum class pixel_info
+  {
+    TRUE,
+    FALSE,
+    NOT_FOUND
+  };
 
-    bool GetPixel(int x, int y, bool* succ = nullptr) const;
-    bool GetPixel(int x, int y, int rotation, bool* succ = nullptr) const;
-    
-    int GetWidth() const;
-    int GetHeight() const;
-    
-    int GetX() const;
-    int GetY() const;
-    int GetRotation() const;
-    
-    void SetX(int newX);
-    void SetY(int newY);
-    void SetRotation(int rotation);
-    
-    void ChangeX(int offset);
-    void ChangeY(int offset);
-    void ChangeRotation(int offset);
+  // creates square at (0, 0)
+  explicit brick();
+  explicit brick(int x, int y, bool *shape);
 
+  pixel_info pixel_at(uint8_t x, uint8_t y) const;
+  pixel_info pixel_at_if(uint8_t x, uint8_t y, brick_rotation rotation) const;
 
-  private:
+  int x() const;
+  int y() const;
+  brick_rotation rotation() const;
 
-    int m_X, m_Y;
-    int m_Rotation;
-    // rotation % 4 = 0 -> 0
-    // rotation % 4 = 1 -> 90
-    // rotation % 4 = 2 -> 180
-    // rotation % 4 = 3 -> 270
-    bool m_Shape[16];
+  void set_x(int x);
+  void set_y(int y);
+  void set_rotation(brick_rotation rotation);
+
+  void move(int x_offset, int y_offset);
+  void rotate_left();
+  void rotate_right();
+
+  static constexpr uint8_t _width = 4U;
+  static constexpr uint8_t _height = 4U;
+
+  namespace models
+  {
+
+    bool model[16] = {
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+    };
+  }
+
+private:
+  int _x, _y;
+  brick_rotation _rotation;
+  bool _pixels[_width * _height];
 };
 
 #endif // __BRICK_HPP__
