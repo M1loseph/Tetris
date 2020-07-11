@@ -1,5 +1,7 @@
-#pragma once
-#include "Controller.h"
+#ifndef __JOYSTICK_HPP__
+#define __JOYSTICK_HPP__
+
+#include "Controller.hpp"
 
 #define DEF_STICK_SENS 900
 
@@ -18,3 +20,5 @@ class Joystick : public Controller {
     bool IfPressedOnce(bool& released, bool pressed) const;
     int m_xAxile, m_yAxile, m_Button, m_StickSens;
 };
+
+#endif // __JOYSTICK_HPP__ 

@@ -1,5 +1,7 @@
-#pragma once
-#include "Controller.h"
+#ifndef __SERIAL_CONTROLLER_HPP__
+#define __SERIAL_CONTROLLER_HPP__
+
+#include "Controller.hpp"
 
 // can be used with usb or bluettoth connection
 class SerialController : public Controller {
@@ -16,3 +18,5 @@ class SerialController : public Controller {
   private:
     int m_Left, m_Right, m_Up, m_Down, m_Button;
 };
+
+#endif // __SERIAL_CONTROLLER_HPP__

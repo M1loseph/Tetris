@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __CONTROLLER_HPP__
+#define __CONTROLLER_HPP__
 
 class Controller {
   public:
@@ -17,3 +18,5 @@ class Controller {
   private:
     bool IfPressedOnce(bool& released, bool pressed) const;
 };
+
+#endif // __CONTROLLER_HPP__

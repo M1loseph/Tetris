@@ -1,6 +1,8 @@
-#pragma once
+#ifndef __RENDERER_HPP__
+#define __RENDERER_HPP__
+
 #include <MD_MAX72xx.h>
-#include "Brick.h"
+#include "Brick.hpp"
 
 class Renderer {
   public:
@@ -24,3 +26,5 @@ class Renderer {
     bool* m_OldFrame;
     MD_MAX72XX* m_Matrix;
 };
+
+#endif // __RENDERER_HPP__

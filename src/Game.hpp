@@ -1,7 +1,9 @@
-#pragma once
-#include "Controller.h"
-#include "Renderer.h"
-#include "Brick.h"
+#ifndef __GAME_HPP__ 
+#define __GAME_HPP__ 
+
+#include "Controller.hpp"
+#include "Renderer.hpp"
+#include "Brick.hpp"
 
 class Game {
   public:
@@ -26,3 +28,5 @@ class Game {
     void UpdateMap();
     void EndScreen();
 };
+
+#endif // __GAME_HPP__

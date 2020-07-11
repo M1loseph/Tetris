@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "Game.hpp"
 
 #define DEF_SPEED 5
 #define USER_UPDATE_RATE 2

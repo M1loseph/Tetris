@@ -1,4 +1,4 @@
-#include "Joystick.h"
+#include "Joystick.hpp"
 #include <Arduino.h>
 
 Joystick::Joystick(int xAxile, int yAxile, int button, int sensitivity) {

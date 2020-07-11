@@ -1,4 +1,4 @@
-#include "Brick.h"
+#include "Brick.hpp"
 
 Brick::Brick(int x, int y, bool shape[16])
 {

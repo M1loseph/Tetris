@@ -1,4 +1,4 @@
-#include "SerialController.h"
+#include "SerialController.hpp"
 #include <Arduino.h>
 
 SerialController::SerialController(char left, char right, char up, char down, char button) {

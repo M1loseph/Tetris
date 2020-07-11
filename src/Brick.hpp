@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __BRICK_HPP__
+#define __BRICK_HPP__
 
 class Brick {
   public:
@@ -34,3 +35,5 @@ class Brick {
     // rotation % 4 = 3 -> 270
     bool m_Shape[16];
 };
+
+#endif // __BRICK_HPP__

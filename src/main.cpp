@@ -1,6 +1,6 @@
-#include "Game.h"
-#include "Joystick.h"
-#include "SerialController.h"
+#include "Game.hpp"
+#include "Joystick.hpp"
+#include "SerialController.hpp"
 
 // screen resolution
 #define WIDTH   8
