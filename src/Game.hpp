@@ -23,7 +23,7 @@ private:
 
   void update_game();
   void render();
-  brick random_brick();
+  void random_brick();
   bool move(int x_offset, int y_offset, brick::brick_rotation rotation);
   void copy_to_board();
   bool game_over();

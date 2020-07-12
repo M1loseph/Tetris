@@ -92,143 +92,21 @@ brick *game::random_brick()
   int defHeight = m_Height * 3 / 4;
   int defWidth = 0;
   int brick = random(6);
-  switch (brick)
-  {
-  case 0:
-  {
-    bool model[16] = {
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    };
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  case 1:
-  {
-    bool model[16] = {
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-    };
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  case 2:
-  {
-    bool model[16] = {
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    };
     return new brick(defWidth, defHeight, model);
     break;
   }
   case 3:
   {
-    bool model[16] = {
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    };
     return new brick(defWidth, defHeight, model);
     break;
   }
   case 4:
   {
-    bool model[16] = {
-        0,
-        0,
-        1,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-        0,
-    };
     return new brick(defWidth, defHeight, model);
     break;
   }
   case 5:
   {
-    bool model[16] = {
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        1,
-        1,
-        1,
-        0,
-        0,
-        0,
-        0,
-    };
     return new brick(defWidth, defHeight, model);
     break;
   }

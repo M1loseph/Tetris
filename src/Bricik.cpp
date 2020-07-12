@@ -2,12 +2,12 @@
 #include <string.h>
 #include "brick.hpp"
 
-
-explicit brick::brick() : _x(0),
-                          _y(0)
+brick::brick() : _x(0),
+                 _y(0)
 {
   memset(_pixels, true, sizeof(_pixels));
 }
+
 // memset is for debuggin purposes
 // if specified pointer is invalid, the shape will become a square
 brick::brick(int x, int y, bool *shape) : _x(x),
@@ -17,6 +17,20 @@ brick::brick(int x, int y, bool *shape) : _x(x),
     memcpy(_pixels, shape, sizeof(_pixels));
   else
     memset(_pixels, true, sizeof(_pixels));
+}
+
+brick::brick(const brick &other) : _x(other._x),
+                                   _y(other._y)
+{
+  memcpy(_pixels, other._pixels, brick::_width * brick::_height);
+}
+
+brick &brick::operator=(const brick &other)
+{
+  _x = other._x;
+  _y = other._y;
+  memcpy(_pixels, other._pixels, brick::_width * brick::_height);
+  return *this;
 }
 
 brick::pixel_info brick::pixel_at(uint8_t x, uint8_t y) const
@@ -33,12 +47,16 @@ brick::pixel_info brick::pixel_at_if(uint8_t x, uint8_t y, brick_rotation rotati
     {
     case brick_rotation::UP:
       is_active = _pixels[x + y * _height];
+      break;
     case brick_rotation::RIGHT:
       is_active = _pixels[(_height - 1) * _width + y - x * _height];
+      break;
     case brick_rotation::DOWN:
       is_active = _pixels[(_width * _height - 1) - x - y * _height];
+      break;
     case brick_rotation::LEFT:
       is_active = _pixels[(_height - 1) - y + x * _height];
+      break;
     }
     return is_active ? pixel_info::TRUE : pixel_info::FALSE;
   }
@@ -78,7 +96,37 @@ void brick::move(int x_offset, int y_offset)
 
 void brick::rotate_left()
 {
+  switch (_rotation)
+  {
+  case brick_rotation::UP:
+    _rotation = brick_rotation::LEFT;
+    break;
+  case brick_rotation::RIGHT:
+    _rotation = brick_rotation::UP;
+    break;
+  case brick_rotation::DOWN:
+    _rotation = brick_rotation::RIGHT;
+    break;
+  case brick_rotation::LEFT:
+    _rotation = brick_rotation::DOWN;
+    break;
+  }
 }
 void brick::rotate_right()
 {
+  switch (_rotation)
+  {
+  case brick_rotation::UP:
+    _rotation = brick_rotation::RIGHT;
+    break;
+  case brick_rotation::RIGHT:
+    _rotation = brick_rotation::DOWN;
+    break;
+  case brick_rotation::DOWN:
+    _rotation = brick_rotation::LEFT;
+    break;
+  case brick_rotation::LEFT:
+    _rotation = brick_rotation::UP;
+    break;
+  }
 }
