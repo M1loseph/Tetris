@@ -10,7 +10,7 @@ brick::brick() : _x(0),
 
 // memset is for debuggin purposes
 // if specified pointer is invalid, the shape will become a square
-brick::brick(int x, int y, bool *shape) : _x(x),
+brick::brick(int x, int y, const bool *shape) : _x(x),
                                           _y(y)
 {
   if (shape)

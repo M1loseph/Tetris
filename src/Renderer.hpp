@@ -7,11 +7,11 @@
 class renderer
 {
 public:
-  renderer(MD_MAX72XX &matrix);
+  explicit renderer(MD_MAX72XX &matrix);
 
   void init();
   void clear();
-  void display();
+  void show();
   void render(const brick &brick);
   bool render_line(int y, uint8_t hex);
   bool render(int x, int y);

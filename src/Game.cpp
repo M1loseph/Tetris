@@ -3,193 +3,161 @@
 #define DEF_SPEED 5
 #define USER_UPDATE_RATE 2
 
-game::game(controller &controller, renderer &renderer, size_t update_interval, size_t uset_input_interval) : _controller(controller),
-                                                                                                             _renderer(renderer),
-                                                                                                             _update_interval(update_interval),
-                                                                                                             _uset_input_interval(uset_input_interval)
+game::game(controller &controller, renderer &renderer, size_t falling_interval, size_t uset_input_interval) : _controller(controller),
+                                                                                                              _renderer(renderer),
+                                                                                                              _falling_interval(falling_interval),
+                                                                                                              _uset_input_interval(uset_input_interval),
+                                                                                                              _make_new_brick(true)
 {
 }
 
 void game::start()
 {
-  _is_running = true;
+  _running = true;
   _renderer.clear();
 
-  unsigned long lastTime = millis();
-  unsigned long delta = ;
-
-  while (!_controller->Button())
+  greeting_screen();
+  while (!_controller.button())
     ;
+
+  unsigned long last_fall_update = millis();
+  unsigned long last_uset_input = last_fall_update;
+
   while (_running)
   {
-    if (millis() - lastTime >= delta)
+    if (millis() - last_fall_update > _falling_interval)
     {
-      lastTime = millis();
-      update_game();
+      last_fall_update = millis();
+      fall();
       render();
     }
-  }
-  EndScreen();
-  delete _current_brick;
-  delete _boards;
-  _boards = nullptr;
-  _current_brick = nullptr;
 
-  return true;
+    if (millis() - last_uset_input > _uset_input_interval)
+    {
+      last_uset_input = millis();
+      // render only if something has actually changed
+      if (process_user_input())
+        render();
+    }
+    read_user_inpup();
+  }
+  end_screen();
+  show_score();
 }
 
-void game::update_game()
+void game::fall()
 {
-  static unsigned long counter = 0;
-  if (!_current_brick)
+  if (_make_new_brick)
   {
-    update_board();
-    _speed = DEF_SPEED;
-    _current_brick = random_brick();
-    if (!move(0, 0, 0))
+    delete_full_rows();
+    random_brick();
+    // if brick cant be in this place, it menas that the hame is over
+    if (!move_user_brick(0, 0))
     {
       _running = false;
       return;
     }
   }
-
-  if (counter % USER_UPDATE_RATE == 0)
-  {
-    if (_controller->Right())
-      move(-1, 0, 0);
-    else if (_controller->Left())
-      move(1, 0, 0);
-    else if (_controller->ButtonPressed())
-      move(0, 0, 1);
-    if (_controller->Down() && _speed != 1)
-      _speed -= 1;
-    if (_controller->Up() && _speed < DEF_SPEED)
-      _speed += 1;
-  }
-  if (counter++ % _speed == 0)
-  {
-    if (!move(0, -1, 0))
-    {
-      copy_to_board();
-    }
-  }
+  if (!move_user_brick(0, -1))
+    copy_brick_to_board();
 }
+
+bool game::process_user_input()
+{
+}
+
+void game::read_user_inpup()
+{
+}
+
 void game::render()
 {
-  for (int y = 0; y < m_Height; y++)
-    for (int x = 0; x < m_Width; x++)
-      if (_boards[x + y * m_Width])
-        _renderer->render(x, y);
+  for (size_t y = 0; y < renderer::_height; y++)
+    for (size_t x = 0; x < renderer::_width; x++)
+      if (_boards[x + y * _renderer._width])
+        _renderer.render(x, y);
 
-  if (_current_brick)
-    _renderer->render(*_current_brick);
-
-  _renderer->Display();
+  _renderer.render(_current_brick);
+  _renderer.show();
 }
 
-brick *game::random_brick()
+void game::random_brick()
 {
-  int defHeight = m_Height * 3 / 4;
-  int defWidth = 0;
-  int brick = random(6);
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  case 3:
-  {
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  case 4:
-  {
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  case 5:
-  {
-    return new brick(defWidth, defHeight, model);
-    break;
-  }
-  }
-  return nullptr;
+  int y = renderer::_height * 3 / 4;
+  int x = 0;
+  int random_number = random(brick::_models_count);
+  _current_brick = brick(x, y, brick::_models[random_number]);
 }
 
-bool game::move(int xOffset, int yOffeset, int rotation)
+bool game::move_user_brick(int x_offset, int y_offeset)
 {
-
-  if (_current_brick)
-  {
-    int finalRotation = _current_brick->rotation() + rotation;
-
-    for (int y = 0; y < _current_brick->_height(); y++)
-    {
-      for (int x = 0; x < _current_brick->_width(); x++)
+  for (uint8_t y = 0; y < brick::_height; y++)
+    for (uint8_t x = 0; x < brick::_width; x++)
+      if (_current_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
-        if (_current_brick->pixel_at(x, y, finalRotation))
-        {
-          int newX = _current_brick->x() + x + xOffset;
-          int newY = _current_brick->y() + y + yOffeset;
+        int new_x = _current_brick.x() + x + x_offset;
+        int new_y = _current_brick.y() + y + y_offeset;
 
-          if (newX >= m_Width || newX < 0)
-            return false;
-          if (newY >= m_Height || newY < 0)
-            return false;
-          if (_boards[newX + newY * m_Width])
-            return false;
-        }
+        if (new_x >= renderer::_width || new_x < 0)
+          return false;
+        if (new_y >= renderer::_height || new_y < 0)
+          return false;
+        if (_boards[new_x + new_y * renderer::_width])
+          return false;
       }
-    }
-    _current_brick->move_x(xOffset);
-    _current_brick->move_y(yOffeset);
-    _current_brick->rotate_right(rotation);
-    return true;
-  }
-  return false;
+  _current_brick.move(x_offset, y_offeset);
+  return true;
 }
 
-void game::copy_to_board()
+bool game::rotate_user_brick()
 {
-  for (int y = 0; y < _current_brick->_height(); y++)
-  {
-    for (int x = 0; x < _current_brick->_width(); x++)
-    {
-      if (_current_brick->pixel_at(x, y))
+
+}
+
+void game::copy_brick_to_board()
+{
+  for (int y = 0; y < brick::_height; y++)
+    for (int x = 0; x < brick::_width; x++)
+      if (_current_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
-        int xCor = _current_brick->x() + x;
-        int yCor = _current_brick->y() + y;
-        _boards[xCor + yCor * m_Width] = true;
+        int x_cor = _current_brick.x() + x;
+        int y_cor = _current_brick.y() + y;
+        _boards[x_cor + y_cor * renderer::_width] = true;
       }
-    }
-  }
-  delete _current_brick;
-  _current_brick = nullptr;
+  // after this copying we need a new brick
+  _make_new_brick = true;
 }
 
-void game::update_board()
+void game::delete_full_rows()
 {
-  for (int y = 0; y < m_Height; y++)
+  for (size_t y = 0; y < renderer::_height; y++)
   {
     bool fullLine = true;
-    for (int x = 0; x < m_Width && fullLine; x++)
+    for (size_t x = 0; x < renderer::_width && fullLine; x++)
     {
-      if (!_boards[x + y * m_Width])
+      if (!_boards[x + y * renderer::_width])
         fullLine = false;
     }
     if (fullLine)
     {
-      for (int i = y * m_Width; i < (m_Height - 1) * m_Width; i++)
-        _boards[i] = _boards[i + m_Width];
+      for (size_t i = y * renderer::_width; i < (renderer::_height - 1) * renderer::_width; i++)
+        _boards[i] = _boards[i + renderer::_width];
 
-      for (int i = (m_Height - 1) * m_Width; i < m_Height * m_Width; i++)
+      for (size_t i = (renderer::_height - 1) * renderer::_height; i < renderer::_height * renderer::_width; i++)
         _boards[i] = false;
       --y;
     }
   }
 }
 
-// reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
-void game::EndScreen()
+void game::greeting_screen()
 {
+}
+
+// reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
+void game::end_screen()
+{
+  /*
   _renderer->Clear();
   delay(200);
   const uint8_t letters[72] = {0x7E, 0x81, 0x80, 0x8F, 0x81, 0x81, 0x81, 0x7E, 0x0,
@@ -208,6 +176,11 @@ void game::EndScreen()
     }
     _renderer->Display();
     delay(200);
-  }
+  }*/
   delay(5000);
+}
+
+void show_score()
+{
+
 }

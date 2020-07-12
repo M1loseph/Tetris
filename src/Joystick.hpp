@@ -7,7 +7,7 @@
 class joystick : public controller
 {
 public:
-  joystick(int x, int y, int button, int stickSens = DEF_SENSITIVITY);
+  explicit joystick(int x, int y, int button, int stickSens = DEF_SENSITIVITY);
 
   bool up() const;
   bool down() const;

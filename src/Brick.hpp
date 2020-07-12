@@ -21,7 +21,7 @@ public:
 
   // creates square at (0, 0)
   explicit brick();
-  explicit brick(int x, int y, bool *shape);
+  explicit brick(int x, int y, const bool *shape);
   explicit brick(const brick &other);
 
   brick &operator=(const brick &other);
@@ -44,9 +44,9 @@ public:
   static constexpr uint8_t _width = 4U;
   static constexpr uint8_t _height = 4U;
 
-  static constexpr size_t _models = 6U;
+  static constexpr size_t _models_count = 6U;
 
-  static constexpr bool models[_models][brick::_height * brick::_width] = {
+  static constexpr bool _models[_models_count][brick::_height * brick::_width] = {
       {0, 0, 0, 0,
        0, 1, 1, 0,
        0, 1, 1, 0,

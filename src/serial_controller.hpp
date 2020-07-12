@@ -7,7 +7,7 @@
 class serial_controller : public controller
 {
 public:
-  serial_controller(char left, char right, char up, char down, char button);
+  explicit serial_controller(char left, char right, char up, char down, char button);
 
   bool up() const;
   bool down() const;

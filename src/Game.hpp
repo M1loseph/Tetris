@@ -8,7 +8,7 @@
 class game
 {
 public:
-  game(controller &controller, renderer &renderer, size_t update_interval, size_t uset_input_interval); // must be allocated staticly
+  explicit game(controller &controller, renderer &renderer, size_t falling_interval, size_t uset_input_interval); // must be allocated staticly
   void start();
 
 private:
@@ -17,19 +17,24 @@ private:
   // again -> static cuz dynamic allocation is not the greatest idea
   bool _boards[renderer::_height * renderer::_width];
   brick _current_brick;
-  bool _is_running;
-  size_t _update_interval;
+  bool _running;
+  size_t _falling_interval;
   size_t _uset_input_interval;
+  bool _make_new_brick;
 
-  void update_game();
+  void fall();
+  bool process_user_input();
+  void read_user_inpup();
   void render();
   void random_brick();
-  bool move(int x_offset, int y_offset, brick::brick_rotation rotation);
-  void copy_to_board();
-  bool game_over();
-  void update_board();
+  bool move_user_brick(int x_offset, int y_offset);
+  bool rotate_user_brick();
+  void copy_user_brick_to_board();
+  void delete_full_rows();
   // TODO => WYJEBAĆ W PIZDU
-  void EndScreen();
+  void greeting_screen();
+  void end_screen();
+  void show_score();
 };
 
 #endif // __GAME_HPP__
