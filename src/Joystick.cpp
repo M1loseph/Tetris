@@ -1,36 +1,24 @@
 #include "joystick.hpp"
 #include <Arduino.h>
 
-joystick::joystick(int x, int y, int button, int sensitivity)
+joystick::joystick(int x, int y, int button, int sensitivity) : controller(),
+                                                                _x_pin(x),
+                                                                _y_pin(y),
+                                                                _button_pin(button),
+                                                                _sensitivity(sensitivity)
 {
-  _x = x;
-  _y = y;
-  _button = button;
-  _sensitivity = sensitivity;
 }
 
-bool joystick::up() const
+void joystick::read_input()
 {
-  return MAX_ANALOG_VALUE - analogRead(_y) > _sensitivity;
-}
-
-bool joystick::down() const
-{
-  return analogRead(_y) > _sensitivity;
-}
-
-bool joystick::left() const
-{
-  return MAX_ANALOG_VALUE - analogRead(_x) > _sensitivity;
-}
-
-bool joystick::right() const
-{
-  return analogRead(_x) > _sensitivity;
-}
-
-bool joystick::button() const
-{
-  // it turned out joystick button works in pullup mode
-  return digitalRead(_button) == LOW;
+  if (MAX_ANALOG_VALUE - analogRead(_y_pin) > _sensitivity)
+    _up = true;
+  if (analogRead(_y_pin) > _sensitivity)
+    _down = true;
+  if (MAX_ANALOG_VALUE - analogRead(_x_pin) > _sensitivity)
+    _left = true;
+  if (analogRead(_x_pin) > _sensitivity)
+    _right = true;
+  if (digitalRead(_button) == LOW)
+    _button = true;
 }

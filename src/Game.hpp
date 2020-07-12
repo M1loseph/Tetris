@@ -1,9 +1,9 @@
 #ifndef __GAME_HPP__
 #define __GAME_HPP__
 
-#include "Controller.hpp"
-#include "Renderer.hpp"
-#include "Brick.hpp"
+#include "controller.hpp"
+#include "renderer.hpp"
+#include "brick.hpp"
 
 class game
 {
@@ -24,12 +24,12 @@ private:
 
   void fall();
   bool process_user_input();
-  void read_user_inpup();
+  void read_user_input();
   void render();
   void random_brick();
-  bool move_user_brick(int x_offset, int y_offset);
-  bool rotate_user_brick();
-  void copy_user_brick_to_board();
+  bool move_brick(int x_offset, int y_offset);
+  bool rotate_brick();
+  void copy_brick_to_board();
   void delete_full_rows();
   // TODO => WYJEBAĆ W PIZDU
   void greeting_screen();

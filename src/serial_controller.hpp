@@ -8,15 +8,10 @@ class serial_controller : public controller
 {
 public:
   explicit serial_controller(char left, char right, char up, char down, char button);
-
-  bool up() const;
-  bool down() const;
-  bool left() const;
-  bool right() const;
-  bool button() const;
+  void read_input();
 
 private:
-  int _left, _right, _up, _down, _button;
+  const char _left_char, _right_char, _up_char, _down_char, _button_char;
 };
 
 #endif // __SERIAL_CONTROLLER_HPP__

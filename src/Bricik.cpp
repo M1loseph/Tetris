@@ -11,7 +11,7 @@ brick::brick() : _x(0),
 // memset is for debuggin purposes
 // if specified pointer is invalid, the shape will become a square
 brick::brick(int x, int y, const bool *shape) : _x(x),
-                                          _y(y)
+                                                _y(y)
 {
   if (shape)
     memcpy(_pixels, shape, sizeof(_pixels));
@@ -130,3 +130,29 @@ void brick::rotate_right()
     break;
   }
 }
+
+const bool brick::_models[_models_count][brick::_height * brick::_width] = {
+    {0, 0, 0, 0,
+     0, 1, 1, 0,
+     0, 1, 1, 0,
+     0, 0, 0, 0},
+    {0, 0, 1, 0,
+     0, 0, 1, 0,
+     0, 0, 1, 0,
+     0, 0, 1, 0},
+    {0, 1, 0, 0,
+     0, 1, 1, 0,
+     0, 0, 1, 0,
+     0, 0, 0, 0},
+    {0, 1, 0, 0,
+     0, 1, 0, 0,
+     0, 1, 1, 0,
+     0, 0, 0, 0},
+    {0, 0, 1, 0,
+     0, 0, 1, 0,
+     0, 1, 1, 0,
+     0, 0, 0, 0},
+    {0, 0, 0, 0,
+     0, 0, 1, 0,
+     0, 1, 1, 1,
+     0, 0, 0, 0}};

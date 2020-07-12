@@ -1,41 +1,27 @@
 #include "serial_controller.hpp"
 #include <Arduino.h>
 
-serial_controller::serial_controller(char left, char right, char up, char down, char button)
+serial_controller::serial_controller(char left, char right, char up, char down, char button) : controller(),
+                                                                                               _left_char(left),
+                                                                                               _right_char(right),
+                                                                                               _up_char(up),
+                                                                                               _down_char(down),
+                                                                                               _button_char(button)
 {
-  _left = left;
-  _right = right;
-  _down = down;
-  _up = up;
-  _button = button;
 }
 
-bool serial_controller::up() const
+void serial_controller::read_input()
 {
-  bool resoult = Serial.read() == _up;
-  return resoult;
-}
-
-bool serial_controller::down() const
-{
-  bool resoult = Serial.read() == _down;
-  return resoult;
-}
-
-bool serial_controller::right() const
-{
-  bool resoult = Serial.read() == _right;
-  return resoult;
-}
-
-bool serial_controller::left() const
-{
-  bool resoult = Serial.read() == _left;
-  return resoult;
-}
-
-bool serial_controller::button() const
-{
-  bool resoult = Serial.read() == _button;
-  return resoult;
+  if (Serial.available())
+  {
+    char c = Serial.read();
+    if (c == _up_char)
+      _up = true;
+    else if (c == _down_char)
+      _down = true;
+    else if (c == _left_char)
+      _left = true;
+    else if (c == _right_char)
+        _right = true;
+  }
 }

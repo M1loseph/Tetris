@@ -1,11 +1,13 @@
+#include <Arduino.h>
+#include "brick.hpp"
 #include "game.hpp"
-#include "Joystick.hpp"
+#include "joystick.hpp"
 #include "serial_controller.hpp"
 
 // screen info
-#define CLK_PIN 13
-#define DATA_PIN 11
-#define CS_PIN 10
+uint8_t CLK_PIN = 13;
+uint8_t DATA_PIN = 11;
+uint8_t CS_PIN = 10;
 
 // joystick pins
 uint8_t JOYSTICK_X = A4;
@@ -23,10 +25,9 @@ void setup()
 
 void loop()
 {
-  // KURWA TODO
-  // NIE PAMIĘTAM, JAK WYGLĄDAŁ KONSTRUKTORA XDDDDDDDDDDD
   MD_MAX72XX matrix(MD_MAX72XX::FC16_HW, DATA_PIN, CLK_PIN, CS_PIN);
   renderer renderer(matrix);
+  renderer.init();
   joystick joystick(JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
   serial_controller keyboard('a', 'd', 'w', 's', ' ');
   game game(joystick, renderer, falling_interval, user_input_interval);

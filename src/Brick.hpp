@@ -46,31 +46,7 @@ public:
 
   static constexpr size_t _models_count = 6U;
 
-  static constexpr bool _models[_models_count][brick::_height * brick::_width] = {
-      {0, 0, 0, 0,
-       0, 1, 1, 0,
-       0, 1, 1, 0,
-       0, 0, 0, 0},
-      {0, 0, 1, 0,
-       0, 0, 1, 0,
-       0, 0, 1, 0,
-       0, 0, 1, 0},
-      {0, 1, 0, 0,
-       0, 1, 1, 0,
-       0, 0, 1, 0,
-       0, 0, 0, 0},
-      {0, 1, 0, 0,
-       0, 1, 0, 0,
-       0, 1, 1, 0,
-       0, 0, 0, 0},
-      {0, 0, 1, 0,
-       0, 0, 1, 0,
-       0, 1, 1, 0,
-       0, 0, 0, 0},
-      {0, 0, 0, 0,
-       0, 0, 1, 0,
-       0, 1, 1, 1,
-       0, 0, 0, 0}};
+  static const bool _models[_models_count][brick::_height * brick::_width];
 
 private:
   int _x;

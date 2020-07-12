@@ -6,11 +6,19 @@
 class controller
 {
 public:
-  virtual bool up() const = 0;
-  virtual bool down() const = 0;
-  virtual bool left() const = 0;
-  virtual bool right() const = 0;
-  virtual bool button() const = 0;
+  controller();
+
+  virtual void read_input() = 0;
+  void reset();
+
+  bool up() const;
+  bool down() const;
+  bool left() const;
+  bool right() const;
+  bool button() const;
+
+protected:
+  bool _up, _down, _left, _right, _button;
 };
 
 #endif // __CONTROLLER_HPP__

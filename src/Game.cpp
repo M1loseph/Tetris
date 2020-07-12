@@ -17,8 +17,8 @@ void game::start()
   _renderer.clear();
 
   greeting_screen();
-  while (!_controller.button())
-    ;
+  // while (!_controller.button())
+  // ;
 
   unsigned long last_fall_update = millis();
   unsigned long last_uset_input = last_fall_update;
@@ -39,7 +39,7 @@ void game::start()
       if (process_user_input())
         render();
     }
-    read_user_inpup();
+    read_user_input();
   }
   end_screen();
   show_score();
@@ -52,22 +52,32 @@ void game::fall()
     delete_full_rows();
     random_brick();
     // if brick cant be in this place, it menas that the hame is over
-    if (!move_user_brick(0, 0))
+    if (!move_brick(0, 0))
     {
       _running = false;
       return;
     }
   }
-  if (!move_user_brick(0, -1))
+  if (!move_brick(0, -1))
     copy_brick_to_board();
 }
 
 bool game::process_user_input()
 {
+  int x_dir = 0;
+  if (_controller.left())
+    x_dir -= 1;
+  if (_controller.right())
+    x_dir += 1;
+
+  if (x_dir != 0)
+    return move_brick(x_dir, 0);
+  return false;
 }
 
-void game::read_user_inpup()
+void game::read_user_input()
 {
+  _controller.read_input();
 }
 
 void game::render()
@@ -89,7 +99,7 @@ void game::random_brick()
   _current_brick = brick(x, y, brick::_models[random_number]);
 }
 
-bool game::move_user_brick(int x_offset, int y_offeset)
+bool game::move_brick(int x_offset, int y_offeset)
 {
   for (uint8_t y = 0; y < brick::_height; y++)
     for (uint8_t x = 0; x < brick::_width; x++)
@@ -109,9 +119,10 @@ bool game::move_user_brick(int x_offset, int y_offeset)
   return true;
 }
 
-bool game::rotate_user_brick()
+bool game::rotate_brick()
 {
-
+  // TODO => IMPLEMENT ROTATION
+  return false;
 }
 
 void game::copy_brick_to_board()
@@ -157,8 +168,7 @@ void game::greeting_screen()
 // reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
 void game::end_screen()
 {
-  /*
-  _renderer->Clear();
+  _renderer.clear();
   delay(200);
   const uint8_t letters[72] = {0x7E, 0x81, 0x80, 0x8F, 0x81, 0x81, 0x81, 0x7E, 0x0,
                                0xFF, 0x81, 0x81, 0x81, 0xFF, 0x81, 0x81, 0x81, 0x0,
@@ -168,19 +178,18 @@ void game::end_screen()
                                0x81, 0x81, 0x42, 0x42, 0x24, 0x24, 0x18, 0x18, 0x0,
                                0xFF, 0x80, 0x80, 0xF8, 0xF8, 0x80, 0x80, 0xFF, 0x0,
                                0xFC, 0x84, 0x84, 0xFC, 0xA0, 0x90, 0x88, 0x84, 0x0};
-  for (int i = 0; i < m_Height + 72; i++)
+  for (int i = 0; i < renderer::_height + 72; i++)
   {
     for (int j = 0; j < 72; j++)
     {
-      _renderer->RenderLine(i - j, letters[j]);
+      _renderer.render_line(i - j, letters[j]);
     }
-    _renderer->Display();
+    _renderer.show();
     delay(200);
-  }*/
+  }
   delay(5000);
 }
 
-void show_score()
+void game::show_score()
 {
-
 }

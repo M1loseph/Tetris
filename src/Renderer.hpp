@@ -15,6 +15,8 @@ public:
   void render(const brick &brick);
   bool render_line(int y, uint8_t hex);
   bool render(int x, int y);
+  bool render(const char* string);
+  bool render(int number);
 
   static constexpr size_t _width = 8U;
   static constexpr size_t _height = 8U;
