@@ -3,7 +3,8 @@
 #include "brick.hpp"
 
 brick::brick() : _x(0),
-                 _y(0)
+                 _y(0),
+                 _rotation(brick_rotation::UP)
 {
   memset(_pixels, true, sizeof(_pixels));
 }
@@ -11,7 +12,8 @@ brick::brick() : _x(0),
 // memset is for debuggin purposes
 // if specified pointer is invalid, the shape will become a square
 brick::brick(int x, int y, const bool *shape) : _x(x),
-                                                _y(y)
+                                                _y(y),
+                                                _rotation(brick_rotation::UP)
 {
   if (shape)
     memcpy(_pixels, shape, sizeof(_pixels));
@@ -20,7 +22,8 @@ brick::brick(int x, int y, const bool *shape) : _x(x),
 }
 
 brick::brick(const brick &other) : _x(other._x),
-                                   _y(other._y)
+                                   _y(other._y),
+                                   _rotation(other._rotation)
 {
   memcpy(_pixels, other._pixels, brick::_width * brick::_height);
 }

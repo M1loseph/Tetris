@@ -19,7 +19,7 @@ public:
   bool render(int number);
 
   static constexpr size_t _width = 8U;
-  static constexpr size_t _height = 8U;
+  static constexpr size_t _height = 32U;
 
 private:
   bool _current_frame[_width * _height];

@@ -22,6 +22,6 @@ void serial_controller::read_input()
     else if (c == _left_char)
       _left = true;
     else if (c == _right_char)
-        _right = true;
+      _right = true;
   }
 }

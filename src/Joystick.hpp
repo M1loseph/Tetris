@@ -4,10 +4,12 @@
 #include "controller.hpp"
 #include <stdlib.h>
 
+typedef unsigned char uint8_t;
+
 class joystick final : public controller
 {
 public:
-  explicit joystick(int x, int y, int button, int stickSens = DEF_SENSITIVITY);
+  explicit joystick(uint8_t x, uint8_t y, uint8_t button, int stickSens = DEF_SENSITIVITY);
 
   void read_input();
 
@@ -16,7 +18,8 @@ public:
   static constexpr int MAX_ANALOG_VALUE = 1023;
 
 private:
-  const int _x_pin, _y_pin, _button_pin, _sensitivity;
+  const uint8_t _x_pin, _y_pin, _button_pin;
+  const int _sensitivity;
 };
 
 #endif // __JOYSTICK_HPP__

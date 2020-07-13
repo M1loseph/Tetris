@@ -1,11 +1,11 @@
 #include "joystick.hpp"
 #include <Arduino.h>
 
-joystick::joystick(int x, int y, int button, int sensitivity) : controller(),
-                                                                _x_pin(x),
-                                                                _y_pin(y),
-                                                                _button_pin(button),
-                                                                _sensitivity(sensitivity)
+joystick::joystick(uint8_t x, uint8_t y, uint8_t button, int sensitivity) : controller(),
+                                                                            _x_pin(x),
+                                                                            _y_pin(y),
+                                                                            _button_pin(button),
+                                                                            _sensitivity(sensitivity)
 {
 }
 

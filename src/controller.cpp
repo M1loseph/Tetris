@@ -25,7 +25,7 @@ bool controller::down() const
 }
 bool controller::left() const
 {
-    return _right;
+    return _left;
 }
 bool controller::right() const
 {
