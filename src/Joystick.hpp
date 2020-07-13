@@ -2,10 +2,9 @@
 #define __JOYSTICK_HPP__
 
 #include "controller.hpp"
-#include <stdlib.h>
+#include <stdint.h>
 
-typedef unsigned char uint8_t;
-
+// TODO => ADD SUPPORT FOR REVERSING AXES
 class joystick final : public controller
 {
 public:

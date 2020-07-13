@@ -1,12 +1,13 @@
 #include "serial_controller.hpp"
 #include <Arduino.h>
 
-serial_controller::serial_controller(char left, char right, char up, char down, char button) : controller(),
-                                                                                               _left_char(left),
-                                                                                               _right_char(right),
-                                                                                               _up_char(up),
-                                                                                               _down_char(down),
-                                                                                               _button_char(button)
+serial_controller::serial_controller(Stream &stream, char left, char right, char up, char down, char button) : controller(),
+                                                                                                               _stream(stream),
+                                                                                                               _left_char(left),
+                                                                                                               _right_char(right),
+                                                                                                               _up_char(up),
+                                                                                                               _down_char(down),
+                                                                                                               _button_char(button)
 {
 }
 
