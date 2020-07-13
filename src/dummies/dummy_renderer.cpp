@@ -19,7 +19,8 @@ void loop()
     MD_MAX72XX matrix(MD_MAX72XX::FC16_HW, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
     renderer renderer(matrix);
     renderer.init();
-    renderer.render(100);
+    renderer.render(1234);
+    delay(4000);
 }
 
 #endif // UNIT_TEST

@@ -28,7 +28,7 @@ public:
 
 private:
   bool _current_frame[_width * _height];
-  bool _old_frame[_width * _height];
+  bool _previous_frame[_width * _height];
 
   // english alphabet contains 26 letters, that souldnt change in the nearest future
   // they are implemented only for 8 pixel wide display

@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include "renderer.hpp"
 #include "custom_functions/get_digit_from_left.hpp"
+#include "logger.hpp"
 
 renderer::renderer(MD_MAX72XX &matrix) : _matrix(matrix)
 {
+  memset(_current_frame, false, sizeof(_current_frame));
+  memset(_previous_frame, false, sizeof(_previous_frame));
 }
 
 void renderer::init()
@@ -19,9 +22,9 @@ void renderer::show()
     for (size_t x = 0; x < _width; x++)
     {
       size_t index = x + y * _width;
-      if (_old_frame[index] != _current_frame[index])
+      if (_previous_frame[index] != _current_frame[index])
         _matrix.setPoint(x, y, _current_frame[index]);
-      _old_frame[index] = _current_frame[index];
+      _previous_frame[index] = _current_frame[index];
       _current_frame[index] = false;
     }
 }
@@ -36,7 +39,7 @@ void renderer::render(const brick &brick)
 
 bool renderer::render(int x, int y)
 {
-  if (x >= 0 && x < _width && y >= 0 && y < _height)
+  if (x >= 0 && static_cast<size_t>(x) < _width && y >= 0 && static_cast<size_t>(y) < _height)
   {
     _current_frame[x + y * _width] = true;
     return true;
@@ -51,7 +54,7 @@ void renderer::clear()
 
 bool renderer::render_line(int y, uint8_t hex)
 {
-  if (y < 0 || y >= _height)
+  if (y < 0 || static_cast<size_t>(y) >= _height)
     return false;
   for (int x = 0; x < 8; x++)
     _current_frame[x + y * _width] = (hex >> x) & 0x01;
@@ -75,16 +78,29 @@ void renderer::render(size_t number)
   // row -> current row we are rendering
   // start from 0 and finish on _heigh + digits * 8 (each digits is displayed using 8 rows)
   for (size_t row = 0; row < _height + digits * _letter_height; row++)
+  {
     for (size_t digit_count = 0; digit_count < digits; digit_count++)
     {
       // digit 0 has index 0, digit 1 has index 1 etc
       uint8_t index = get_digit_from_left(number, digits, digit_count);
+      SERIAL_PRINT("Digit: ");
+      SERIAL_PRINTLN(index);
+      int top_row = static_cast<int>(row) - static_cast<int>(digit_count) * static_cast<int>(_letter_height);
+      SERIAL_PRINT("Top row: ");
+      SERIAL_PRINTLN(top_row);
       for (size_t i = 0; i < _letter_height; i++)
       {
-        int y = static_cast<int>(row) - static_cast<int>(digit_count) * static_cast<int>(_letter_height) - static_cast<int>(i);
-        render_line(y, _digits[index][i]);
+        int y = top_row + static_cast<int>(i);
+        SERIAL_PRINT("y: ");
+        SERIAL_PRINTLN(y);
+        SERIAL_PRINT("row: ");
+        SERIAL_PRINTLN(_digits[index][i]);
+        render_line(y, _digits[index][_letter_height - 1 - i]);
       }
     }
+    show();
+    delay(200);
+  }
 }
 
 const uint8_t renderer::_aplhabet[26][8] = {
