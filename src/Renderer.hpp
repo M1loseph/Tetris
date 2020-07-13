@@ -15,9 +15,10 @@ public:
   void render(const brick &brick);
   bool render_line(int y, uint8_t hex);
   bool render(int x, int y);
+  // right now it only supports strings up to ${_supportet_length} characters
   bool render(const char *string);
   // negative numbers are not yet supported
-  void render(size_t number);
+  void render(int number);
 
   static constexpr size_t _width = 8U;
   static constexpr size_t _height = 32U;
@@ -27,6 +28,10 @@ public:
   static constexpr size_t _letter_width = 8U;
 
 private:
+  static constexpr int _no_length = 0;
+
+  bool is_string_valid(const char *string, size_t length = _no_length);
+
   bool _current_frame[_width * _height];
   bool _previous_frame[_width * _height];
 
@@ -39,6 +44,5 @@ private:
   // removed 'new' operatuz cuz its not the greatest idea to use it one microcontroller
   MD_MAX72XX &_matrix;
 };
-
 
 #endif // __RENDERER_HPP__

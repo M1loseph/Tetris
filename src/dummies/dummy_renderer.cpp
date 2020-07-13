@@ -19,7 +19,9 @@ void loop()
     MD_MAX72XX matrix(MD_MAX72XX::FC16_HW, DATA_PIN, CLK_PIN, CS_PIN, SEGMENTS);
     renderer renderer(matrix);
     renderer.init();
+    renderer.render("dupa123");
     renderer.render(1234);
+    renderer.render("dupa");
     delay(4000);
 }
 

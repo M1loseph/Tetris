@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <stdio.h>
 #include "renderer.hpp"
 #include "custom_functions/get_digit_from_left.hpp"
 #include "logger.hpp"
@@ -63,44 +64,71 @@ bool renderer::render_line(int y, uint8_t hex)
 
 bool renderer::render(const char *string)
 {
-  return false;
-}
-void renderer::render(size_t number)
-{
-  size_t copt_of_number = number;
-  size_t digits = 0;
-  do
-  {
-    digits++;
-    copt_of_number /= 10;
-  } while (copt_of_number);
+  // calculate length only if given pointer isn't NULL
+  size_t str_length = string ? strlen(string) : 0;
 
-  // row -> current row we are rendering
-  // start from 0 and finish on _heigh + digits * 8 (each digits is displayed using 8 rows)
-  for (size_t row = 0; row < _height + digits * _letter_height; row++)
+  if (string)
   {
-    for (size_t digit_count = 0; digit_count < digits; digit_count++)
+    // from now only only work with buffer - all chars are lower case
+    // we will render only letters, digits and spaces
+    if (is_string_valid(string, str_length))
     {
-      // digit 0 has index 0, digit 1 has index 1 etc
-      uint8_t index = get_digit_from_left(number, digits, digit_count);
-      SERIAL_PRINT("Digit: ");
-      SERIAL_PRINTLN(index);
-      int top_row = static_cast<int>(row) - static_cast<int>(digit_count) * static_cast<int>(_letter_height);
-      SERIAL_PRINT("Top row: ");
-      SERIAL_PRINTLN(top_row);
-      for (size_t i = 0; i < _letter_height; i++)
+      for (size_t row = 0; row < _height + str_length * _letter_height; row++)
       {
-        int y = top_row + static_cast<int>(i);
-        SERIAL_PRINT("y: ");
-        SERIAL_PRINTLN(y);
-        SERIAL_PRINT("row: ");
-        SERIAL_PRINTLN(_digits[index][i]);
-        render_line(y, _digits[index][_letter_height - 1 - i]);
+        for (size_t current_char = 0; current_char < str_length; current_char++)
+        {
+          int top_row_index = static_cast<int>(row) - static_cast<int>(current_char) * static_cast<int>(_letter_height);
+
+          char c = string[current_char];
+
+          bool is_digit = isdigit(c);
+          bool is_alpha = isalpha(c);
+          bool is_upper = isupper(c);
+
+          for (size_t i = 0; i < _letter_height; i++)
+          {
+            int y = top_row_index - static_cast<int>(i);
+            SERIAL_PRINT("y: ");
+            SERIAL_PRINTLN(y);
+            if (is_digit)
+              render_line(y, _digits[c - '0'][i]);
+            else if (is_alpha)
+            {
+              if (is_upper)
+                render_line(y, _aplhabet[c - 'A'][i]);
+              else
+                render_line(y, _aplhabet[c - 'a'][i]);
+            }
+            else
+              render_line(y, 0); // this means it was a space
+          }
+        }
+        show();
+        delay(200);
       }
     }
-    show();
-    delay(200);
   }
+  return false;
+}
+
+void renderer::render(int number)
+{
+  char buffer[10];
+  sprintf(buffer, "%d", number);
+  render(buffer);
+}
+
+bool renderer::is_string_valid(const char *string, size_t length)
+{
+  if (!length)
+    length = strlen(string);
+
+  // dont accept if its not digit, alpha nor space
+  for (size_t i = 0; i < length; i++)
+    if (!isalnum(string[i]) && string[i] != ' ')
+      return false;
+
+  return true;
 }
 
 const uint8_t renderer::_aplhabet[26][8] = {
