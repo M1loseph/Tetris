@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "renderer.hpp"
 #include "custom_functions/get_digit_from_left.hpp"
-#include "logger.hpp"
 
 renderer::renderer(MD_MAX72XX &matrix) : _matrix(matrix)
 {
@@ -88,8 +87,6 @@ bool renderer::render(const char *string)
           for (size_t i = 0; i < _letter_height; i++)
           {
             int y = top_row_index - static_cast<int>(i);
-            SERIAL_PRINT("y: ");
-            SERIAL_PRINTLN(y);
             if (is_digit)
               render_line(y, _digits[c - '0'][i]);
             else if (is_alpha)

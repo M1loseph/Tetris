@@ -44,7 +44,7 @@ public:
   static constexpr uint8_t _width = 4U;
   static constexpr uint8_t _height = 4U;
 
-  static constexpr size_t _models_count = 6U;
+  static constexpr size_t _models_count = 7U;
 
   static const bool _models[_models_count][brick::_height * brick::_width];
 

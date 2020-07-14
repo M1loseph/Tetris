@@ -158,4 +158,8 @@ const bool brick::_models[_models_count][brick::_height * brick::_width] = {
     {0, 0, 0, 0,
      0, 0, 1, 0,
      0, 1, 1, 1,
+     0, 0, 0, 0},
+    {0, 0, 1, 0,
+     0, 1, 1, 0,
+     0, 1, 0, 0,
      0, 0, 0, 0}};

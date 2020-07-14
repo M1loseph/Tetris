@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 // TODO => ADD SUPPORT FOR REVERSING AXES
+// TODO => IMPROVE IMPLEMENTATION TO MAKE IT EASIER TO MOVE (KEYBOARD IS GOIND MUCH BETTER RIGHT NOW)
 class joystick final : public controller
 {
 public:

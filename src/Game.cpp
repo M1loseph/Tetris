@@ -3,25 +3,29 @@
 
 game::game(controller &controller, renderer &renderer, size_t falling_interval, size_t uset_input_interval) : _controller(controller),
                                                                                                               _renderer(renderer),
+                                                                                                              _create_new_brick(true),
                                                                                                               _falling_interval(falling_interval),
                                                                                                               _uset_input_interval(uset_input_interval),
-                                                                                                              _create_new_brick(true)
+                                                                                                              _points(0),
+                                                                                                              _level(0),
+                                                                                                              _lines_deleted(0)
 {
-  memset(_boards, false, sizeof(_boards));
+  memset(_board, false, sizeof(_board));
 }
 
 void game::start()
 {
-  SERIAL_PRINTLN("Starting game");
-  _create_new_brick = true;
   _renderer.clear();
 
   greeting_screen();
 
+  _lines_deleted = 0;
+  _points = 0;
+  _level = 0;
+  _create_new_brick = true;
   unsigned long last_fall_update = millis();
   unsigned long last_uset_input = last_fall_update;
 
-  SERIAL_PRINTLN("Entering loop");
   while (create_brick())
   {
     read_user_input();
@@ -68,23 +72,11 @@ void game::fall()
 
 bool game::process_user_input()
 {
-  SERIAL_PRINTLN("Processing user input");
   int x_dir = 0;
   if (_controller.left())
     x_dir += 1;
   if (_controller.right())
     x_dir -= 1;
-
-  SERIAL_PRINT("Left: ");
-  SERIAL_PRINTLN(_controller.left());
-  SERIAL_PRINT("Right: ");
-  SERIAL_PRINTLN(_controller.right());
-  SERIAL_PRINT("Up: ");
-  SERIAL_PRINTLN(_controller.up());
-  SERIAL_PRINT("Down: ");
-  SERIAL_PRINTLN(_controller.down());
-  SERIAL_PRINT("Button: ");
-  SERIAL_PRINTLN(_controller.button());
 
   bool something_changed = false;
 
@@ -99,16 +91,14 @@ bool game::process_user_input()
 
 void game::read_user_input()
 {
-  SERIAL_PRINTLN("Reading user input");
   _controller.read_input();
 }
 
 void game::render()
 {
-  SERIAL_PRINTLN("Rendering");
   for (size_t y = 0; y < renderer::_height; y++)
     for (size_t x = 0; x < renderer::_width; x++)
-      if (_boards[x + y * _renderer._width])
+      if (_board[x + y * _renderer._width])
         _renderer.render(x, y);
 
   _renderer.render(_brick);
@@ -117,8 +107,7 @@ void game::render()
 
 void game::random_brick()
 {
-  SERIAL_PRINTLN("Creating random brick");
-  constexpr int x = 0;
+  constexpr int x = 2;
   constexpr int y = renderer::_height - brick::_height;
   int random_number = random(brick::_models_count);
   _brick = brick(x, y, brick::_models[random_number]);
@@ -126,7 +115,6 @@ void game::random_brick()
 
 bool game::move_brick(int x_offset, int y_offeset)
 {
-  SERIAL_PRINTLN("Moving brick");
   for (uint8_t y = 0; y < brick::_height; y++)
     for (uint8_t x = 0; x < brick::_width; x++)
       if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
@@ -138,7 +126,7 @@ bool game::move_brick(int x_offset, int y_offeset)
           return false;
         if (new_y < 0 || static_cast<size_t>(new_y) >= renderer::_height)
           return false;
-        if (_boards[new_x + new_y * renderer::_width])
+        if (_board[new_x + new_y * renderer::_width])
           return false;
       }
   _brick.move(x_offset, y_offeset);
@@ -147,91 +135,101 @@ bool game::move_brick(int x_offset, int y_offeset)
 
 bool game::rotate_brick()
 {
-  SERIAL_PRINTLN("Rotating brick");
   _brick.rotate_right();
 
   for (uint8_t y = 0; y < _brick._height; y++)
-  {
     for (int8_t x = 0; x < _brick._width; x++)
-    {
       if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
         // for debugging purposes
-        CHECK_IMPLMENTATION(_brick.pixel_at(x, y));
+        // CHECK_IMPLEMENTATION(_brick.pixel_at(x, y));
         // if point is out of map or it collides with seomthing from board
         // -> rotate back and return false
         int x_cor = _brick.x() + static_cast<int>(x);
         int y_cor = _brick.y() + static_cast<int>(y);
         int board_index = x_cor + y_cor * renderer::_width;
-        if (x_cor < 0 || static_cast<size_t>(x_cor) >= renderer::_width || y_cor < 0 || static_cast<size_t>(y_cor) > renderer::_height || _boards[board_index])
+        if (x_cor < 0 || static_cast<size_t>(x_cor) >= renderer::_width || y_cor < 0 || static_cast<size_t>(y_cor) > renderer::_height || _board[board_index])
         {
-          SERIAL_PRINT("Sopmething went wrong at pixel: (");
-          SERIAL_PRINT(x_cor);
-          SERIAL_PRINT(',');
-          SERIAL_PRINT(y_cor);
-          SERIAL_PRINTLN(')');
           _brick.rotate_left();
           return false;
         }
       }
-    }
-  }
+
   return true;
 }
 
 void game::copy_brick_to_board()
 {
-  SERIAL_PRINTLN("Copying brick to the board");
   for (int y = 0; y < brick::_height; y++)
     for (int x = 0; x < brick::_width; x++)
       if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
         int x_cor = _brick.x() + x;
         int y_cor = _brick.y() + y;
-        _boards[x_cor + y_cor * renderer::_width] = true;
+        _board[x_cor + y_cor * renderer::_width] = true;
       }
   // after this copying we need a new brick
   _create_new_brick = true;
 }
 
+// TODO => MAKE LESS COPIES AND MAKE IT FASTER
 void game::delete_full_rows()
 {
-  SERIAL_PRINTLN("Deleting full rows");
+  size_t lines_deleted = 0;
   for (size_t y = 0; y < renderer::_height; y++)
   {
     bool fullLine = true;
     for (size_t x = 0; x < renderer::_width && fullLine; x++)
     {
-      if (!_boards[x + y * renderer::_width])
+      if (!_board[x + y * renderer::_width])
         fullLine = false;
     }
     if (fullLine)
     {
       for (size_t i = y * renderer::_width; i < (renderer::_height - 1) * renderer::_width; i++)
-        _boards[i] = _boards[i + renderer::_width];
+        _board[i] = _board[i + renderer::_width];
 
       for (size_t i = (renderer::_height - 1) * renderer::_height; i < renderer::_height * renderer::_width; i++)
-        _boards[i] = false;
+        _board[i] = false;
       --y;
+      lines_deleted++;
     }
+  }
+  if (lines_deleted)
+  {
+    _points += _points_rules[lines_deleted - 1U] * (_level + 1U);
+    _lines_deleted += lines_deleted;
+    if(_lines_deleted >= (_level + 1U) * _level_change_diff)
+      _level++;
+
+    if ((_lines_deleted / _level_change_diff * (_level + 1)) > _level)
+    SERIAL_PRINT("Lines deleted: ");
+    SERIAL_PRINTLN(lines_deleted);
+    SERIAL_PRINT("Level: ");
+    SERIAL_PRINTLN(_level);
+    SERIAL_PRINT("Lines deleted so far: ");
+    SERIAL_PRINTLN(_lines_deleted);
+    SERIAL_PRINT("Points: ");
+    SERIAL_PRINTLN(_points);
   }
 }
 
 void game::greeting_screen()
 {
-  SERIAL_PRINTLN("Greeting user");
   _renderer.render("Hello");
 }
 
 // reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
 void game::end_screen()
 {
-  SERIAL_PRINTLN("Showing end screen");
   _renderer.render("game over");
 }
 
 void game::show_score()
 {
-  SERIAL_PRINTLN("Showing score");
-  _renderer.render("score");
+  char buffer[100];
+  sprintf(buffer, "score %d", _points);
+  _renderer.render(buffer);
 }
+
+const size_t game::_points_rules[brick::_height] = {40U, 100U, 300U, 1200U};

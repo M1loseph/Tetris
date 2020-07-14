@@ -30,8 +30,6 @@ public:
 private:
   static constexpr int _no_length = 0;
 
-  bool is_string_valid(const char *string, size_t length = _no_length);
-
   bool _current_frame[_width * _height];
   bool _previous_frame[_width * _height];
 
@@ -43,6 +41,9 @@ private:
   // reference to the external MD_MAX72XX, needs to live longer than Renderer object
   // removed 'new' operatuz cuz its not the greatest idea to use it one microcontroller
   MD_MAX72XX &_matrix;
+
+private:
+  bool is_string_valid(const char *string, size_t length = _no_length);
 };
 
 #endif // __RENDERER_HPP__
