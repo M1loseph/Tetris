@@ -13,6 +13,7 @@ void controller::reset()
     _down = false;
     _left = false;
     _right = false;
+    _button = false;
 }
 
 bool controller::up() const

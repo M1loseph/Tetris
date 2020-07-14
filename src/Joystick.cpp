@@ -19,6 +19,6 @@ void joystick::read_input()
     _left = true;
   if (analogRead(_x_pin) > _sensitivity)
     _right = true;
-  if (digitalRead(_button) == LOW)
+  if (digitalRead(_button_pin) == LOW)
     _button = true;
 }

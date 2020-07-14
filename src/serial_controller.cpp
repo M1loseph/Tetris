@@ -24,5 +24,7 @@ void serial_controller::read_input()
       _left = true;
     else if (c == _right_char)
       _right = true;
+    else if (c == _button_char)
+      _button = true;
   }
 }

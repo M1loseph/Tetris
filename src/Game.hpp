@@ -16,7 +16,7 @@ private:
   renderer &_renderer;
   // again -> static cuz dynamic allocation is not the greatest idea
   bool _boards[renderer::_height * renderer::_width];
-  brick _current_brick;
+  brick _brick;
   size_t _falling_interval;
   size_t _uset_input_interval;
   bool _create_new_brick;

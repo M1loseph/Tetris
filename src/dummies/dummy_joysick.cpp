@@ -28,7 +28,7 @@ void loop()
     {
         last_time = millis();
         Serial.println("JOYSTICK");
-        Serial.println("Left: ");
+        Serial.print("Left: ");
         Serial.println(j.left());
         Serial.print("Right: ");
         Serial.println(j.right());
@@ -36,10 +36,12 @@ void loop()
         Serial.println(j.up());
         Serial.print("Down: ");
         Serial.println(j.down());
+        Serial.print("Button: ");
+        Serial.println(j.button());
         j.reset();
 
         Serial.println("\nSERIAL");
-        Serial.println("Left: ");
+        Serial.print("Left: ");
         Serial.println(s.left());
         Serial.print("Right: ");
         Serial.println(s.right());
@@ -47,6 +49,8 @@ void loop()
         Serial.println(s.up());
         Serial.print("Down: ");
         Serial.println(s.down());
+        Serial.print("Button: ");
+        Serial.println(s.button());
         s.reset();
     }
 }
