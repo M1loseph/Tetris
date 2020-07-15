@@ -8,11 +8,15 @@
 class game
 {
 public:
-  explicit game(controller &controller, renderer &renderer, size_t falling_interval, size_t uset_input_interval); // must be allocated staticly
+  explicit game(controller &controller, renderer &renderer); // must be allocated staticly
   void start();
 
   static const size_t _points_rules[brick::_height];
   static constexpr size_t _level_change_diff = 10U;
+  static constexpr size_t _init_fall_interval = 250U;
+  static constexpr size_t _min_fall_interval = 50U;
+  static constexpr size_t _speed_delta = 20U;
+  static constexpr size_t _boost_speed = _min_fall_interval;
 
 private:
   controller &_controller;
@@ -21,15 +25,15 @@ private:
   bool _board[renderer::_height * renderer::_width];
   bool _create_new_brick;
 
-  brick _brick;
+  size_t _current_interval;
 
-  size_t _falling_interval;
-  size_t _uset_input_interval;
+  brick _brick;
 
   size_t _points;
   size_t _level;
   size_t _lines_deleted;
 
+  bool _boost;
 
 private:
   bool create_brick();

@@ -13,7 +13,7 @@ serial_controller::serial_controller(Stream &stream, char left, char right, char
 
 void serial_controller::read_input()
 {
-  if (Serial.available())
+  while (Serial.available())
   {
     char c = Serial.read();
     if (c == _up_char)

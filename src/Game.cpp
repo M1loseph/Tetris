@@ -1,14 +1,14 @@
 #include "logger.hpp"
 #include "game.hpp"
 
-game::game(controller &controller, renderer &renderer, size_t falling_interval, size_t uset_input_interval) : _controller(controller),
-                                                                                                              _renderer(renderer),
-                                                                                                              _create_new_brick(true),
-                                                                                                              _falling_interval(falling_interval),
-                                                                                                              _uset_input_interval(uset_input_interval),
-                                                                                                              _points(0),
-                                                                                                              _level(0),
-                                                                                                              _lines_deleted(0)
+game::game(controller &controller, renderer &renderer) : _controller(controller),
+                                                         _renderer(renderer),
+                                                         _create_new_brick(true),
+                                                         _current_interval(_init_fall_interval),
+                                                         _points(0),
+                                                         _level(0),
+                                                         _lines_deleted(0),
+                                                         _boost(false)
 {
   memset(_board, false, sizeof(_board));
 }
@@ -17,26 +17,23 @@ void game::start()
 {
   _renderer.clear();
 
-  greeting_screen();
+  //greeting_screen();
 
   _lines_deleted = 0;
   _points = 0;
   _level = 0;
   _create_new_brick = true;
+  _current_interval = _init_fall_interval;
   unsigned long last_fall_update = millis();
-  unsigned long last_uset_input = last_fall_update;
 
   while (create_brick())
   {
     read_user_input();
-    if (millis() - last_uset_input > _uset_input_interval)
-    {
-      last_uset_input = millis();
-      // render only if something has actually changed
-      if (process_user_input())
-        render();
-    }
-    if (millis() - last_fall_update > _falling_interval)
+    if (process_user_input())
+      render();
+
+    unsigned long delta = millis() - last_fall_update;
+    if (_boost ? delta > _boost_speed : delta > _current_interval)
     {
       last_fall_update = millis();
       fall();
@@ -67,6 +64,7 @@ void game::fall()
   {
     copy_brick_to_board();
     delete_full_rows();
+    _boost = false;
   }
 }
 
@@ -77,6 +75,10 @@ bool game::process_user_input()
     x_dir += 1;
   if (_controller.right())
     x_dir -= 1;
+  if (_controller.down())
+    _boost = true;
+  if (_controller.up())
+    _boost = false;
 
   bool something_changed = false;
 
@@ -199,10 +201,12 @@ void game::delete_full_rows()
   {
     _points += _points_rules[lines_deleted - 1U] * (_level + 1U);
     _lines_deleted += lines_deleted;
-    if(_lines_deleted >= (_level + 1U) * _level_change_diff)
+    if (_lines_deleted >= (_level + 1U) * _level_change_diff)
+    {
       _level++;
-
-    if ((_lines_deleted / _level_change_diff * (_level + 1)) > _level)
+      if (_current_interval > _min_fall_interval)
+        _current_interval -= _speed_delta;
+    }
     SERIAL_PRINT("Lines deleted: ");
     SERIAL_PRINTLN(lines_deleted);
     SERIAL_PRINT("Level: ");

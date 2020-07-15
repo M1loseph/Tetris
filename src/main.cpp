@@ -17,8 +17,6 @@ constexpr uint8_t JOYSTICK_X = A4;
 constexpr uint8_t JOYSTICK_Y = A5;
 constexpr uint8_t JOYSTICK_B = 2;
 
-constexpr size_t falling_interval = 150U;
-constexpr size_t user_input_interval = 50U;
 
 void setup()
 {
@@ -34,7 +32,7 @@ void loop()
   renderer.init();
   joystick joystick(JOYSTICK_X, JOYSTICK_Y, JOYSTICK_B);
   serial_controller keyboard(Serial, 'a', 'd', 'w', 's', ' ');
-  game game(keyboard, renderer, falling_interval, user_input_interval);
+  game game(keyboard, renderer);
   game.start();
 }
 #endif // UNIT_TEST
