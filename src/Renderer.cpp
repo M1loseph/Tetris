@@ -5,8 +5,8 @@
 
 renderer::renderer(MD_MAX72XX &matrix) : _matrix(matrix)
 {
-  memset(_current_frame, false, sizeof(_current_frame));
-  memset(_previous_frame, false, sizeof(_previous_frame));
+  memset(_current_frame, 0U, sizeof(_current_frame));
+  memset(_previous_frame, 0U, sizeof(_previous_frame));
 }
 
 void renderer::init()
@@ -18,30 +18,31 @@ void renderer::init()
 
 void renderer::show()
 {
-  for (size_t y = 0; y < _height; y++)
-    for (size_t x = 0; x < _width; x++)
+  for (uint8_t y = 0; y < _height; y++)
+    for (uint8_t x = 0; x < _width; x++)
     {
-      size_t index = x + y * _width;
-      if (_previous_frame[index] != _current_frame[index])
-        _matrix.setPoint(x, y, _current_frame[index]);
-      _previous_frame[index] = _current_frame[index];
-      _current_frame[index] = false;
+      if (((_previous_frame[y] >> x) & 0x1) != ((_current_frame[y] >> x) & 0x1))
+      {
+        _matrix.setPoint(x, y, (_current_frame[y] >> x) & 0x1);
+        _previous_frame[y] ^= 0x1 << x;
+      }
+      _current_frame[y] &= ~(0x1 << x);
     }
 }
 
 void renderer::render(const brick &brick)
 {
-  for (int y = 0; y < brick._height; y++)
-    for (int x = 0; x < brick._width; x++)
+  for (uint8_t y = 0; y < brick._height; y++)
+    for (uint8_t x = 0; x < brick._width; x++)
       if (brick.pixel_at(x, y) == brick::pixel_info::TRUE)
-        render(brick.x() + x, brick.y() + y);
+        render(brick.x() + static_cast<int>(x), brick.y() + static_cast<int>(y));
 }
 
 bool renderer::render(int x, int y)
 {
-  if (x >= 0 && static_cast<size_t>(x) < _width && y >= 0 && static_cast<size_t>(y) < _height)
+  if (x >= 0 && x < static_cast<int>(_width) && y >= 0 && y < static_cast<int>(_height))
   {
-    _current_frame[x + y * _width] = true;
+    _current_frame[y] |= (0x1 << x);
     return true;
   }
   return false;
@@ -54,20 +55,19 @@ void renderer::clear()
 
 bool renderer::render_line(int y, uint8_t hex)
 {
-  if (y < 0 || static_cast<size_t>(y) >= _height)
-    return false;
-  for (int x = 0; x < 8; x++)
-    _current_frame[x + y * _width] = (hex >> x) & 0x01;
-  return true;
+  if (y >= 0  &&  y < static_cast<int>(_height))
+  {
+    _current_frame[y] = hex;
+    return true;
+  }
+  return false;
 }
 
 bool renderer::render(const char *string)
 {
-  // calculate length only if given pointer isn't NULL
-  size_t str_length = string ? strlen(string) : 0;
-
   if (string)
   {
+    size_t str_length = strlen(string);
     // from now only only work with buffer - all chars are lower case
     // we will render only letters, digits and spaces
     if (is_string_valid(string, str_length))
@@ -76,17 +76,17 @@ bool renderer::render(const char *string)
       {
         for (size_t current_char = 0; current_char < str_length; current_char++)
         {
-          int top_row_index = static_cast<int>(row) - static_cast<int>(current_char) * static_cast<int>(_letter_height);
+          const int top_row_index = static_cast<int>(row) - static_cast<int>(current_char) * static_cast<int>(_letter_height);
 
-          char c = string[current_char];
+          const char c = string[current_char];
 
-          bool is_digit = isdigit(c);
-          bool is_alpha = isalpha(c);
-          bool is_upper = isupper(c);
+          const bool is_digit = isdigit(c);
+          const bool is_alpha = isalpha(c);
+          const bool is_upper = isupper(c);
 
-          for (size_t i = 0; i < _letter_height; i++)
+          for (uint8_t i = 0; i < _letter_height; i++)
           {
-            int y = top_row_index - static_cast<int>(i);
+            const int y = top_row_index - static_cast<int>(i);
             if (is_digit)
               render_line(y, _digits[c - '0'][i]);
             else if (is_alpha)
