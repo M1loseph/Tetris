@@ -17,9 +17,9 @@ joystick::joystick(uint8_t x, uint8_t y, uint8_t button, int sensitivity) : cont
 void joystick::read_input()
 {
   static unsigned long _last_debounce = millis();
-  int x = analogRead(_x_pin);
-  int y = analogRead(_y_pin);
-  bool button_reading = digitalRead(_button_pin);
+  const int x = analogRead(_x_pin);
+  const int y = analogRead(_y_pin);
+  const bool button_reading = digitalRead(_button_pin);
 
   check_reading(_max_analog - y > _sensitivity, _up, _up_released);
   check_reading(y > _sensitivity, _down, _down_released);

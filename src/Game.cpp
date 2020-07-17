@@ -113,7 +113,7 @@ void game::render()
 
 void game::random_brick()
 {
-  const int x = 2;
+  const int x = random(renderer::_width - brick::_width);
   const int y = renderer::_height - brick::_height;
   int random_number = random(brick::_models_count);
   _brick = brick(x, y, brick::_models[random_number]);
