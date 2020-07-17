@@ -2,7 +2,6 @@
 #define __RENDERER_HPP__
 
 #include <MD_MAX72xx.h>
-#include "renderer.hpp"
 #include "brick.hpp"
 
 class renderer
