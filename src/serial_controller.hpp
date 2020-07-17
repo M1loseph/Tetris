@@ -2,7 +2,7 @@
 #define __SERIAL_CONTROLLER_HPP__
 
 #include <Arduino.h>
-#include "Controller.hpp"
+#include "controller.hpp"
 
 // can be used with usb or bluettoth connection
 class serial_controller : public controller

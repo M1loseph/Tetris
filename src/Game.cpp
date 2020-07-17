@@ -103,14 +103,18 @@ void game::render()
       if (_board[x + y * _renderer._width])
         _renderer.render(x, y);
 
-  _renderer.render(_brick);
+  for (uint8_t y = 0; y < brick::_height; y++)
+    for (uint8_t x = 0; x < brick::_width; x++)
+      if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
+        _renderer.render(_brick.x() + static_cast<int>(x), _brick.y() + static_cast<int>(y));
+
   _renderer.show();
 }
 
 void game::random_brick()
 {
-  constexpr int x = 2;
-  constexpr int y = renderer::_height - brick::_height;
+  const int x = 2;
+  const int y = renderer::_height - brick::_height;
   int random_number = random(brick::_models_count);
   _brick = brick(x, y, brick::_models[random_number]);
 }
@@ -121,8 +125,8 @@ bool game::move_brick(int x_offset, int y_offeset)
     for (uint8_t x = 0; x < brick::_width; x++)
       if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
-        int new_x = _brick.x() + x + x_offset;
-        int new_y = _brick.y() + y + y_offeset;
+        const int new_x = _brick.x() + x + x_offset;
+        const int new_y = _brick.y() + y + y_offeset;
 
         if (new_x < 0 || static_cast<size_t>(new_x) >= renderer::_width)
           return false;
@@ -144,12 +148,12 @@ bool game::rotate_brick()
       if (_brick.pixel_at(x, y) == brick::pixel_info::TRUE)
       {
         // for debugging purposes
-        // CHECK_IMPLEMENTATION(_brick.pixel_at(x, y));
+        CHECK_IMPLEMENTATION(_brick.pixel_at(x, y));
         // if point is out of map or it collides with seomthing from board
         // -> rotate back and return false
-        int x_cor = _brick.x() + static_cast<int>(x);
-        int y_cor = _brick.y() + static_cast<int>(y);
-        int board_index = x_cor + y_cor * renderer::_width;
+        const int x_cor = _brick.x() + static_cast<int>(x);
+        const int y_cor = _brick.y() + static_cast<int>(y);
+        const int board_index = x_cor + y_cor * renderer::_width;
         if (x_cor < 0 || static_cast<size_t>(x_cor) >= renderer::_width || y_cor < 0 || static_cast<size_t>(y_cor) > renderer::_height || _board[board_index])
         {
           _brick.rotate_left();
@@ -223,7 +227,6 @@ void game::greeting_screen()
   _renderer.render("Hello");
 }
 
-// reimplementacja -> zrobić to na zasadzie stringów, nie takich gównianych tablic
 void game::end_screen()
 {
   _renderer.render("game over");

@@ -15,7 +15,7 @@ void serial_controller::read_input()
 {
   while (Serial.available())
   {
-    char c = Serial.read();
+    const char c = Serial.read();
     if (c == _up_char)
       _up = true;
     else if (c == _down_char)

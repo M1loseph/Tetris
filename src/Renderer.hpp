@@ -2,6 +2,7 @@
 #define __RENDERER_HPP__
 
 #include <MD_MAX72xx.h>
+#include "renderer.hpp"
 #include "brick.hpp"
 
 class renderer
@@ -12,7 +13,6 @@ public:
   void init();
   void clear();
   void show();
-  void render(const brick &brick);
   bool render_line(int y, uint8_t hex);
   bool render(int x, int y);
   bool render(const char *string);

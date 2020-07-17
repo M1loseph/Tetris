@@ -5,12 +5,16 @@
 #include "renderer.hpp"
 #include "brick.hpp"
 
+// unlike renderer, the game can be played on any rendering device that supports pixel rendering
+// it is not limited to 8 pixels in width, it can be any number, but needs to be specified in the static data section
+template<typename Renderer>
 class game
 {
 public:
   explicit game(controller &controller, renderer &renderer); // must be allocated staticly
   void start();
 
+  // number of points depends on how many lines you delete at the same time
   static const size_t _points_rules[brick::_height];
   static constexpr size_t _level_change_diff = 10U;
   static constexpr size_t _init_fall_interval = 250U;

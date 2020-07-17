@@ -30,13 +30,6 @@ void renderer::show()
     }
 }
 
-void renderer::render(const brick &brick)
-{
-  for (uint8_t y = 0; y < brick._height; y++)
-    for (uint8_t x = 0; x < brick._width; x++)
-      if (brick.pixel_at(x, y) == brick::pixel_info::TRUE)
-        render(brick.x() + static_cast<int>(x), brick.y() + static_cast<int>(y));
-}
 
 bool renderer::render(int x, int y)
 {
@@ -68,8 +61,7 @@ bool renderer::render(const char *string)
   if (string)
   {
     size_t str_length = strlen(string);
-    // from now only only work with buffer - all chars are lower case
-    // we will render only letters, digits and spaces
+    // we will render only letters, digits and spaces - oher characters are not supported
     if (is_string_valid(string, str_length))
     {
       for (size_t row = 0; row < _height + str_length * _letter_height; row++)
@@ -101,6 +93,7 @@ bool renderer::render(const char *string)
           }
         }
         show();
+        // i didnt have a better idea how to pull this off, for now theres a simple delay
         delay(200);
       }
     }

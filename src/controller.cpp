@@ -1,9 +1,9 @@
 #include "controller.hpp"
 
 controller::controller() : _up(false),
-                           _down(false),
-                           _left(false),
-                           _right(false)
+                               _down(false),
+                               _left(false),
+                               _right(false)
 {
 }
 
