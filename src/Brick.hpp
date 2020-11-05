@@ -12,13 +12,6 @@ public:
     LEFT
   };
 
-  enum class pixel_info
-  {
-    TRUE,
-    FALSE,
-    NOT_FOUND
-  };
-
   // creates square at (0, 0)
   explicit brick();
   explicit brick(int x, int y, const bool *shape);
@@ -26,8 +19,8 @@ public:
 
   brick &operator=(const brick &other);
 
-  pixel_info pixel_at(uint8_t x, uint8_t y) const;
-  pixel_info pixel_at_if(uint8_t x, uint8_t y, brick_rotation rotation) const;
+  bool pixel_at(uint8_t x, uint8_t y, bool* success = nullptr) const;
+  bool pixel_at_if(uint8_t x, uint8_t y, brick_rotation rotation, bool* success = nullptr) const;
 
   int x() const;
   int y() const;

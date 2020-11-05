@@ -1,124 +1,122 @@
 #include <Arduino.h>
 #include <stdio.h>
 #include "renderer.hpp"
-#include "custom_functions/get_digit_from_left.hpp"
 
 renderer::renderer(MD_MAX72XX &matrix) : _matrix(matrix)
 {
-  memset(_current_frame, 0U, sizeof(_current_frame));
-  memset(_previous_frame, 0U, sizeof(_previous_frame));
+    memset(_current_frame, 0U, sizeof(_current_frame));
+    memset(_previous_frame, 0U, sizeof(_previous_frame));
 }
 
 void renderer::init()
 {
-  _matrix.begin();
-  _matrix.control(MD_MAX72XX::UPDATE, MD_MAX72XX::ON);
-  _matrix.clear();
+    _matrix.begin();
+    _matrix.control(MD_MAX72XX::UPDATE, MD_MAX72XX::ON);
+    _matrix.clear();
 }
 
 void renderer::show()
 {
-  for (uint8_t y = 0; y < _height; y++)
-    for (uint8_t x = 0; x < _width; x++)
-    {
-      if (((_previous_frame[y] >> x) & 0x1) != ((_current_frame[y] >> x) & 0x1))
-      {
-        _matrix.setPoint(x, y, (_current_frame[y] >> x) & 0x1);
-        _previous_frame[y] ^= 0x1 << x;
-      }
-      _current_frame[y] &= ~(0x1 << x);
-    }
+    for (uint8_t y = 0; y < _height; y++)
+        for (uint8_t x = 0; x < _width; x++)
+        {
+            if (((_previous_frame[y] >> x) & 0x1) != ((_current_frame[y] >> x) & 0x1))
+            {
+                _matrix.setPoint(x, y, (_current_frame[y] >> x) & 0x1);
+                _previous_frame[y] ^= 0x1 << x;
+            }
+            _current_frame[y] &= ~(0x1 << x);
+        }
 }
-
 
 bool renderer::render(int x, int y)
 {
-  if (x >= 0 && x < static_cast<int>(_width) && y >= 0 && y < static_cast<int>(_height))
-  {
-    _current_frame[y] |= (0x1 << x);
-    return true;
-  }
-  return false;
+    if (x >= 0 && x < static_cast<int>(_width) && y >= 0 && y < static_cast<int>(_height))
+    {
+        _current_frame[y] |= (0x1 << x);
+        return true;
+    }
+    return false;
 }
 
 void renderer::clear()
 {
-  _matrix.clear();
+    _matrix.clear();
 }
 
 bool renderer::render_line(int y, uint8_t hex)
 {
-  if (y >= 0  &&  y < static_cast<int>(_height))
-  {
-    _current_frame[y] = hex;
-    return true;
-  }
-  return false;
+    if (y >= 0 && y < static_cast<int>(_height))
+    {
+        _current_frame[y] = hex;
+        return true;
+    }
+    return false;
 }
 
 bool renderer::render(const char *string)
 {
-  if (string)
-  {
-    size_t str_length = strlen(string);
-    // we will render only letters, digits and spaces - oher characters are not supported
-    if (is_string_valid(string, str_length))
+    if (string)
     {
-      for (size_t row = 0; row < _height + str_length * _letter_height; row++)
-      {
-        for (size_t current_char = 0; current_char < str_length; current_char++)
+        size_t str_length = strlen(string);
+        // we will render only letters, digits and spaces - oher characters are not supported
+        if (is_string_valid(string, str_length))
         {
-          const int top_row_index = static_cast<int>(row) - static_cast<int>(current_char) * static_cast<int>(_letter_height);
-
-          const char c = string[current_char];
-
-          const bool is_digit = isdigit(c);
-          const bool is_alpha = isalpha(c);
-          const bool is_upper = isupper(c);
-
-          for (uint8_t i = 0; i < _letter_height; i++)
-          {
-            const int y = top_row_index - static_cast<int>(i);
-            if (is_digit)
-              render_line(y, _digits[c - '0'][i]);
-            else if (is_alpha)
+            for (size_t row = 0; row < _height + str_length * _letter_height; row++)
             {
-              if (is_upper)
-                render_line(y, _aplhabet[c - 'A'][i]);
-              else
-                render_line(y, _aplhabet[c - 'a'][i]);
+                for (size_t current_char = 0; current_char < str_length; current_char++)
+                {
+                    const int top_row_index = static_cast<int>(row) - static_cast<int>(current_char) * static_cast<int>(_letter_height);
+
+                    const char c = string[current_char];
+
+                    const bool is_digit = isdigit(c);
+                    const bool is_alpha = isalpha(c);
+                    const bool is_upper = isupper(c);
+
+                    for (uint8_t i = 0; i < _letter_height; i++)
+                    {
+                        const int y = top_row_index - static_cast<int>(i);
+                        if (is_digit)
+                            render_line(y, _digits[c - '0'][i]);
+                        else if (is_alpha)
+                        {
+                            if (is_upper)
+                                render_line(y, _aplhabet[c - 'A'][i]);
+                            else
+                                render_line(y, _aplhabet[c - 'a'][i]);
+                        }
+                        else
+                            render_line(y, 0); // this means it was a space
+                    }
+                }
+                show();
+                // i didnt have a better idea how to pull this off, for now theres a simple delay
+                delay(200);
             }
-            else
-              render_line(y, 0); // this means it was a space
-          }
         }
-        show();
-        // i didnt have a better idea how to pull this off, for now theres a simple delay
-        delay(200);
-      }
     }
-  }
-  return false;
+    return false;
 }
 
 void renderer::render(int number)
 {
-  char buffer[10];
-  sprintf(buffer, "%d", number);
-  render(buffer);
+    char buffer[10];
+    sprintf(buffer, "%d", number);
+    render(buffer);
 }
 
 bool renderer::is_string_valid(const char *string, size_t length)
 {
-  if (!length)
-    length = strlen(string);
+    if (!length)
+        length = strlen(string);
 
-  // dont accept if its not digit, alpha nor space
-  for (size_t i = 0; i < length; i++)
-    if (!isalnum(string[i]) && string[i] != ' ')
-      return false;
+    // dont accept if its not digit, alpha nor space
+    for (size_t i = 0; i < length; i++)
+        if (!isalnum(string[i]) && string[i] != ' ')
+            return false;
 
-  return true;
+    return true;
 }
 
 const uint8_t renderer::_aplhabet[26][8] = {

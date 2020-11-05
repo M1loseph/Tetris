@@ -3,19 +3,53 @@
 
 // abstract class, that needs to be implemented to use different types of controlls to play Tetris
 // it can be anything, from joystick, some buttons, keypad or ever Serial communication
+template <class Derived>
 class controller
 {
 public:
-  controller();
+  explicit controller() : _up(false),
+                          _down(false),
+                          _left(false),
+                          _right(false)
+  {
+  }
 
-  virtual void read_input() = 0;
-  void reset();
+  // controller(const controller<Derived>& other) = delete;
 
-  bool up() const;
-  bool down() const;
-  bool left() const;
-  bool right() const;
-  bool button() const;
+  void read_input()
+  {
+    static_cast<Derived *>(this)->read_input();
+  }
+
+  void reset()
+  {
+    _up = false;
+    _down = false;
+    _left = false;
+    _right = false;
+    _button = false;
+  }
+
+  bool up() const
+  {
+    return _up;
+  }
+  bool down() const
+  {
+    return _down;
+  }
+  bool left() const
+  {
+    return _left;
+  }
+  bool right() const
+  {
+    return _right;
+  }
+  bool button() const
+  {
+    return _button;
+  }
 
 protected:
   bool _up, _down, _left, _right, _button;
