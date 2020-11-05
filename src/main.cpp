@@ -8,6 +8,8 @@
 
 void setup()
 {
+    // to generate random seed
+    randomSeed(analogRead(A2));
     Serial.begin(115200);
 }
 
